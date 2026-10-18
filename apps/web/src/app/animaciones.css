@@ -1,0 +1,519 @@
+/* ==========================================================================
+   Capa de animación
+   Construida sobre scroll-driven animations nativas (animation-timeline),
+   @property para interpolar valores personalizados, y transforms 3D.
+   Todo se apaga con prefers-reduced-motion.
+   Nota: animation-timeline debe declararse DESPUÉS del atajo animation.
+   ========================================================================== */
+
+/* --------------------------------- propiedades animables (@property) ----- */
+
+@property --angulo {
+  syntax: '<angle>';
+  initial-value: 135deg;
+  inherits: false;
+}
+
+@property --brillo {
+  syntax: '<percentage>';
+  initial-value: 0%;
+  inherits: false;
+}
+
+@property --nivel {
+  syntax: '<percentage>';
+  initial-value: 0%;
+  inherits: false;
+}
+
+/* ------------------------------------------- barra de progreso de lectura */
+
+.progreso {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 3px;
+  z-index: 100;
+  transform-origin: 0 50%;
+  background: linear-gradient(
+    90deg,
+    var(--c-puntoRosa),
+    var(--c-puntoNaranja),
+    var(--c-puntoVerde),
+    var(--c-puntoAzul)
+  );
+  scale: 0 1;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media not (prefers-reduced-motion: reduce) {
+    .progreso {
+      animation: crecer-x linear forwards;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes crecer-x {
+  from { scale: 0 1; }
+  to   { scale: 1 1; }
+}
+
+/* ------------------------------------------------- entradas al hacer scroll */
+
+@media not (prefers-reduced-motion: reduce) {
+  @supports (animation-timeline: view()) {
+    /* Sube y aparece */
+    .anim-subir {
+      animation: subir both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 32%;
+    }
+
+    /* Entra desde el costado */
+    .anim-lado {
+      animation: desde-lado both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 35%;
+    }
+
+    /* Escala con un leve giro: le da peso físico */
+    .anim-posar {
+      animation: posar both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+
+    /* Se desenfoca hasta enfocar */
+    .anim-enfocar {
+      animation: enfocar both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 38%;
+    }
+
+    /* Recorta de abajo hacia arriba, como si se escribiera */
+    .anim-revelar {
+      animation: revelar both;
+      animation-timeline: view();
+      animation-range: entry 15% cover 42%;
+    }
+
+    /* La sección entera se aleja levemente al salir */
+    .anim-despedir {
+      animation: despedir both;
+      animation-timeline: view();
+      animation-range: exit 20% exit 100%;
+    }
+  }
+}
+
+@keyframes subir {
+  from { opacity: 0; translate: 0 44px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes desde-lado {
+  from { opacity: 0; translate: -46px 0; rotate: -1.5deg; }
+  to   { opacity: 1; translate: 0 0; rotate: 0deg; }
+}
+
+@keyframes posar {
+  from { opacity: 0; scale: 0.9; rotate: -2.5deg; }
+  to   { opacity: 1; scale: 1; rotate: 0deg; }
+}
+
+@keyframes enfocar {
+  from { opacity: 0; filter: blur(14px); scale: 1.04; }
+  to   { opacity: 1; filter: blur(0); scale: 1; }
+}
+
+@keyframes revelar {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); translate: 0 18px; }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); translate: 0 0; }
+}
+
+@keyframes despedir {
+  to { opacity: 0.25; scale: 0.96; }
+}
+
+/* Escalonado: cada hijo entra un poco después que el anterior. */
+.escalonar > * {
+  --retraso: calc(var(--i, 0) * 70ms);
+}
+
+@media not (prefers-reduced-motion: reduce) {
+  .escalonar > * {
+    animation: subir 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--retraso);
+  }
+}
+
+/* ------------------------------------------------- título con gradiente vivo */
+
+@media not (prefers-reduced-motion: reduce) {
+  .hero__titulo {
+    background: linear-gradient(
+      var(--angulo),
+      var(--c-mora) 0%,
+      var(--c-moraBrillante) 45%,
+      var(--c-pulpa) 70%,
+      var(--c-puntoNaranja) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: girar-gradiente 9s linear infinite;
+  }
+
+  :root[data-theme='dark'] .hero__titulo {
+    background: linear-gradient(
+      var(--angulo),
+      #f6d9e4 0%,
+      var(--c-pulpa) 45%,
+      var(--c-puntoNaranja) 75%,
+      var(--c-puntoRosa) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+@keyframes girar-gradiente {
+  to { --angulo: 495deg; }
+}
+
+/* --------------------------------------------- aparición de letras del título */
+
+.letras { display: inline-block; }
+
+.letras span {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+  .letras span {
+    animation: caer-letra 0.9s cubic-bezier(0.19, 1.3, 0.32, 1) both;
+    animation-delay: calc(var(--n, 0) * 85ms);
+  }
+}
+
+@keyframes caer-letra {
+  0%   { opacity: 0; translate: 0 -70px; rotate: -14deg; scale: 0.7; }
+  60%  { opacity: 1; }
+  100% { opacity: 1; translate: 0 0; rotate: 0deg; scale: 1; }
+}
+
+/* ------------------------------------------------------- moras flotando */
+
+.moras {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mora-flotante {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--c-pulpa), var(--c-mora) 68%);
+  opacity: 0.16;
+  will-change: transform;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+  .mora-flotante {
+    animation: deriva var(--dur, 19s) ease-in-out var(--delay, 0s) infinite;
+  }
+}
+
+@keyframes deriva {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  25%      { translate: 22px -34px; rotate: 90deg; }
+  50%      { translate: -16px -62px; rotate: 180deg; }
+  75%      { translate: -30px -28px; rotate: 270deg; }
+}
+
+/* --------------------------------------------------------- frasco que se llena */
+
+.frasco { position: relative; display: block; width: 100%; height: auto; }
+
+.frasco__relleno { transform-origin: 50% 100%; }
+
+@supports (animation-timeline: view()) {
+  @media not (prefers-reduced-motion: reduce) {
+    .frasco__relleno {
+      animation: llenar linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 60%;
+    }
+
+    .frasco__burbuja {
+      animation: burbujear 3.2s ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+  }
+}
+
+@keyframes llenar {
+  from { scale: 1 0; }
+  to   { scale: 1 1; }
+}
+
+@keyframes burbujear {
+  0%   { opacity: 0; translate: 0 0; scale: 0.5; }
+  35%  { opacity: 0.75; }
+  100% { opacity: 0; translate: 0 -46px; scale: 1.15; }
+}
+
+/* --------------------------------------------------- tarjetas con inclinación 3D */
+
+.inclinable {
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s;
+  will-change: transform;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .inclinable:hover {
+    box-shadow: var(--sombra-f);
+  }
+
+  .inclinable[data-inclinando='si'] {
+    transform:
+      perspective(900px)
+      rotateX(var(--rx, 0deg))
+      rotateY(var(--ry, 0deg))
+      translateZ(10px);
+    transition: transform 0.08s linear, box-shadow 0.35s;
+  }
+
+  /* Reflejo que sigue al cursor */
+  .inclinable::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in srgb, var(--c-puntoNaranja) 22%, transparent),
+      transparent 62%
+    );
+  }
+
+  .inclinable:hover::after { opacity: 1; }
+}
+
+/* ------------------------------------------------------- botones magnéticos */
+
+.boton {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
+}
+
+.boton::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 32%, rgba(255, 255, 255, 0.4) 50%, transparent 68%);
+  translate: -120% 0;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+  .boton:hover::before {
+    animation: destello 0.75s ease-out;
+  }
+}
+
+@keyframes destello {
+  to { translate: 120% 0; }
+}
+
+/* ------------------------------------------------ números que cuentan solos */
+
+.metrica__valor {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+  .metrica {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s;
+  }
+
+  .metrica:hover {
+    transform: translateY(-4px);
+    border-color: var(--c-puntoNaranja);
+  }
+}
+
+/* --------------------------------------------- numeración del proceso viva */
+
+@media not (prefers-reduced-motion: reduce) {
+  .paso__numero {
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.4s, color 0.4s;
+  }
+
+  .paso:hover .paso__numero {
+    transform: scale(1.14) rotate(-8deg);
+    background: var(--c-moraBrillante);
+    color: var(--c-crema);
+  }
+}
+
+/* La línea del proceso se dibuja a medida que bajas. */
+@supports (animation-timeline: view()) {
+  @media not (prefers-reduced-motion: reduce) {
+    .pasos::before {
+      transform-origin: 50% 0;
+      animation: crecer-y linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes crecer-y {
+  from { scale: 1 0; }
+  to   { scale: 1 1; }
+}
+
+/* ----------------------------------------- campos de la etiqueta con pulso */
+
+@media not (prefers-reduced-motion: reduce) {
+  .etiqueta__campo[data-obligatorio='si']::after {
+    animation: latir 2.6s ease-in-out infinite;
+    animation-delay: calc(var(--p, 0) * 160ms);
+  }
+}
+
+@keyframes latir {
+  0%, 100% { opacity: 0.45; scale: 1; }
+  50%      { opacity: 1; scale: 1.5; }
+}
+
+/* El sello entra con un golpe seco, como un timbre de caucho. */
+@supports (animation-timeline: view()) {
+  @media not (prefers-reduced-motion: reduce) {
+    .etiqueta__sello {
+      animation: sellar both;
+      animation-timeline: view();
+      animation-range: entry 25% cover 45%;
+    }
+  }
+}
+
+@keyframes sellar {
+  0%   { opacity: 0; scale: 2.6; rotate: -22deg; filter: blur(5px); }
+  70%  { opacity: 1; scale: 0.93; rotate: 4deg; filter: blur(0); }
+  85%  { scale: 1.05; rotate: -2deg; }
+  100% { opacity: 1; scale: 1; rotate: 0deg; }
+}
+
+/* ---------------------------------------------------- fotos de la galería */
+
+.galeria figure {
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s,
+    filter 0.45s;
+}
+
+.galeria img {
+  transition: scale 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .galeria figure:hover img { scale: 1.09; }
+
+  /* Las demás se apagan cuando una recibe el cursor. */
+  .galeria:hover figure:not(:hover) {
+    filter: saturate(0.45) brightness(0.92);
+    transform: scale(0.98);
+  }
+}
+
+/* -------------------------------------------------------- vapor de la olla */
+
+.vapor { pointer-events: none; }
+
+@media not (prefers-reduced-motion: reduce) {
+  .vapor path {
+    animation: humear 4.5s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+    transform-origin: 50% 100%;
+  }
+}
+
+@keyframes humear {
+  0%   { opacity: 0; translate: 0 6px; scale: 0.85; }
+  30%  { opacity: 0.55; }
+  100% { opacity: 0; translate: 0 -40px; scale: 1.25; }
+}
+
+/* ------------------------------------------------- secuencia de carga inicial */
+
+@media not (prefers-reduced-motion: reduce) {
+  .carga-1 { animation: subir 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+  .carga-2 { animation: subir 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+  .carga-3 { animation: subir 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both; }
+  .carga-4 { animation: posar 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+}
+
+/* ------------------------------------------------------- enlaces del menú */
+
+.nav__enlaces a {
+  position: relative;
+  padding-block: 4px;
+}
+
+.nav__enlaces a::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  height: 2px;
+  background: var(--c-puntoNaranja);
+  scale: 0 1;
+  transform-origin: 100% 50%;
+  transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nav__enlaces a:hover::after {
+  scale: 1 1;
+  transform-origin: 0 50%;
+}
+
+/* El botón de tema gira al cambiar. */
+.tema { transition: rotate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
+.tema:hover { rotate: 25deg; background: color-mix(in srgb, var(--c-puntoNaranja) 16%, transparent); }
+
+/* ------------------------------------------------------ View Transitions */
+
+@view-transition { navigation: auto; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+}
+
+/* --------------------------------------------------------- utilidades */
+
+.flotar-suave {
+  animation: flotar-suave 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flotar-suave { animation: none; }
+}
+
+@keyframes flotar-suave {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -12px; }
+}

@@ -16,6 +16,7 @@ const FOTOS = [
 export default function Pagina() {
   return (
     <>
+      <div className="progreso" aria-hidden="true" />
       <Nav />
 
       <header className="hero" id="inicio">

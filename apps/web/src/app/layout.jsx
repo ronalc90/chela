@@ -1,4 +1,5 @@
 import './globals.css';
+import './animaciones.css';
 import { marca, producto, tipografia } from '@chela/brand/tokens';
 
 export const metadata = {
