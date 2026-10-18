@@ -38,9 +38,9 @@
   background: linear-gradient(
     90deg,
     var(--c-pulpa),
-    var(--c-hojaClara),
-    var(--c-hoja),
-    var(--c-brote)
+    var(--c-ambar),
+    var(--c-ambarHondo),
+    var(--c-ambarClaro)
   );
   scale: 0 1;
 }
@@ -148,39 +148,12 @@
   }
 }
 
-/* ------------------------------------------------- título con gradiente vivo */
+/* ----------------------------------------- el emblema respira en el hero */
 
 @media not (prefers-reduced-motion: reduce) {
-  .hero__titulo {
-    background: linear-gradient(
-      var(--angulo),
-      var(--c-mora) 0%,
-      var(--c-moraBrillante) 45%,
-      var(--c-pulpa) 70%,
-      var(--c-hojaClara) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: girar-gradiente 9s linear infinite;
+  .hero__emblema {
+    animation: flotar-suave 6.5s ease-in-out infinite;
   }
-
-  :root[data-theme='dark'] .hero__titulo {
-    background: linear-gradient(
-      var(--angulo),
-      #f6d9e4 0%,
-      var(--c-pulpa) 45%,
-      var(--c-hojaClara) 75%,
-      var(--c-pulpa) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-}
-
-@keyframes girar-gradiente {
-  to { --angulo: 495deg; }
 }
 
 /* --------------------------------------------- aparición de letras del título */
@@ -301,7 +274,7 @@
     transition: opacity 0.3s;
     background: radial-gradient(
       380px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in srgb, var(--c-hojaClara) 22%, transparent),
+      color-mix(in srgb, var(--c-ambar) 22%, transparent),
       transparent 62%
     );
   }
@@ -349,7 +322,7 @@
 
   .metrica:hover {
     transform: translateY(-4px);
-    border-color: var(--c-hojaClara);
+    border-color: var(--c-ambar);
   }
 }
 
@@ -479,7 +452,7 @@
   inset-inline: 0;
   inset-block-end: 0;
   height: 2px;
-  background: var(--c-hojaClara);
+  background: var(--c-ambar);
   scale: 0 1;
   transform-origin: 100% 50%;
   transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -492,7 +465,7 @@
 
 /* El botón de tema gira al cambiar. */
 .tema { transition: rotate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
-.tema:hover { rotate: 25deg; background: color-mix(in srgb, var(--c-hojaClara) 16%, transparent); }
+.tema:hover { rotate: 25deg; background: color-mix(in srgb, var(--c-ambar) 16%, transparent); }
 
 /* ------------------------------------------------------ View Transitions */
 
@@ -569,11 +542,18 @@
   inset: 0;
   background: #fdfcf7;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5%;
+  padding: 4% 5%;
+  container-type: inline-size;
+}
+
+.envoltura-etq__fila {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 3%;
-  padding: 4% 5%;
-  container-type: inline-size;
 }
 
 .envoltura-etq__texto { min-width: 0; }
@@ -610,9 +590,11 @@
 .envoltura-etq__lote {
   font-family: var(--f-mono);
   font-size: 3.5cqw;
-  margin: 2.5% 0 0;
+  margin: 0;
   color: #6b5560;
   white-space: nowrap;
+  border-top: 0.08em solid rgba(36, 27, 30, 0.18);
+  padding-top: 1.5%;
 }
 
 .envoltura-etq__sello { width: 22%; flex-shrink: 0; }
@@ -664,7 +646,7 @@
 /* ------------------------------------------------- hoja del logotipo */
 
 .nav__hoja, .etiqueta__hoja {
-  color: var(--c-hojaClara);
+  color: var(--c-ambar);
   margin-right: 0.22em;
   display: inline-block;
 }

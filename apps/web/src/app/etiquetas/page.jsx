@@ -6,6 +6,7 @@ import { construirEtiqueta, validarEtiqueta } from '@chela/brand/etiqueta';
 import { svgEan13, esEanValido } from '@chela/brand/barcode';
 import { svgSello } from '@chela/brand/nutricional';
 import { marca, producto } from '@chela/brand/tokens';
+import { Emblema } from '@/components/Logo';
 
 const HOY = new Date().toISOString().slice(0, 10);
 
@@ -277,8 +278,8 @@ const Etiqueta = forwardRef(function Etiqueta({ etiqueta, barras, sello }, ref) 
       <div className="etq__cabecera">
         <div>
           <p className="etq__marca">
-            <span className="etq__hoja">&#10087;</span>
-            {marca.nombre}
+            <Emblema tamano={26} className="etq__emblema" />
+            <span><span className="etq__sabor">Sabor</span><span className="etq__puro">Puro</span></span>
           </p>
           <p className="etq__denominacion">{etiqueta.frente.denominacion}</p>
           <p className="etq__calificativo">{etiqueta.frente.calificativo}</p>

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { svgEan13 } from '@chela/brand/barcode';
 import { svgSello } from '@chela/brand/nutricional';
 import { construirEtiqueta } from '@chela/brand/etiqueta';
+import { Emblema } from './Logo';
 
 /**
  * La etiqueta hecha a mano, ahora digital y verificable.
@@ -147,8 +148,10 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
             <h3 className="etiqueta__marca">
               {campo('marca', (
                 <>
-                  <span className="etiqueta__hoja" aria-hidden="true">❧</span>
-                  EcoCreaciones
+                  <Emblema tamano={26} className="etiqueta__emblema" />
+                  <span className="marca-wm">
+                    <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
+                  </span>
                 </>
               ))}
             </h3>

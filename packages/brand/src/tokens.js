@@ -13,11 +13,11 @@
  *    Son formatos distintos y solo uno puede ser el vigente.
  */
 
-export const SITIO = 'https://ecocreaciones.com';
+export const SITIO = 'https://saborpuro.lat';
 
 export const marca = {
-  nombre: 'EcoCreaciones',
-  nombreCorto: 'EcoCreaciones',
+  nombre: 'SaborPuro',
+  nombreCorto: 'SaborPuro',
   descriptor: 'Mermelada artesanal de mora',
   eslogan: 'Del cultivo a la mesa, sin atajos',
   razonSocial: 'Mujeres Usmeñas',
@@ -33,7 +33,7 @@ export const marca = {
     telefono: '311 583 9051',
     telefonoAlterno: '321 383 8226',
     whatsapp: '+57 311 583 9051',
-    email: 'hola@ecocreaciones.com',
+    email: 'hola@saborpuro.lat',
   },
 };
 
@@ -56,20 +56,20 @@ export const producto = {
   referenciaEan: '10100',
 };
 
-/** Paleta: morados de la mora sobre verdes de huerta. */
+/** Paleta: morados de la mora con ámbar de miel. */
 export const colores = {
-  mora: '#3E1026',
-  moraClara: '#6E2245',
-  moraBrillante: '#9C2F5E',
-  pulpa: '#C44B7B',
-  hoja: '#2F6B42',
-  hojaClara: '#5FA573',
-  brote: '#8FC79A',
-  tierra: '#8C5A3C',
+  mora: '#3A0E24',
+  moraClara: '#68203F',
+  moraBrillante: '#A32C63',
+  pulpa: '#D6457E',
+  ambarHondo: '#B57618',
+  ambar: '#E8A33D',
+  ambarClaro: '#F6CE87',
   tapa: '#D9A521',
-  crema: '#F6F2E7',
-  cremaOscura: '#E5DECB',
-  papel: '#FCFBF6',
+  tierra: '#8C5A3C',
+  crema: '#F7F1E6',
+  cremaOscura: '#E9DFCB',
+  papel: '#FCFAF4',
   tinta: '#241B1E',
 };
 

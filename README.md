@@ -1,10 +1,10 @@
-# EcoCreaciones — Mermelada artesanal de mora
+# SaborPuro — Mermelada artesanal de mora
 
 Sitio web, trazabilidad de lotes y generador de etiquetas para imprimir,
 de la mermelada de mora elaborada por **Mujeres Usmeñas** en Usme,
 Bogotá D.C.
 
-**Dominio:** https://ecocreaciones.com
+**Dominio:** https://saborpuro.lat
 
 ## Qué hace
 

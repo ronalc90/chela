@@ -5,7 +5,7 @@ import './responsive.css';
 import { marca, producto, tipografia } from '@chela/brand/tokens';
 
 export const metadata = {
-  metadataBase: new URL('https://ecocreaciones.com'),
+  metadataBase: new URL('https://saborpuro.lat'),
   title: {
     default: `${marca.nombre} — ${marca.descriptor}`,
     template: `%s · ${marca.nombre}`,
@@ -32,7 +32,7 @@ export const viewport = {
 const scriptTema = `
 (function () {
   try {
-    var t = localStorage.getItem('eco-tema');
+    var t = localStorage.getItem('puro-tema');
     if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
   } catch (e) {}
 })();

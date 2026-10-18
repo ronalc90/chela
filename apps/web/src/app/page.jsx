@@ -4,6 +4,7 @@ import EtiquetaViva from '@/components/EtiquetaViva';
 import Calculadora from '@/components/Calculadora';
 import Trazabilidad from '@/components/Trazabilidad';
 import FrascoConEtiqueta from '@/components/FrascoConEtiqueta';
+import { Emblema } from '@/components/Logo';
 import { marca, producto } from '@chela/brand/tokens';
 
 const FOTOS = [
@@ -20,13 +21,10 @@ export default function Pagina() {
       <header className="hero" id="inicio">
         <div className="envoltura hero__rejilla">
           <div>
-            <div className="hero__puntos" aria-hidden="true">
-              <span className="hero__punto" />
-              <span className="hero__punto" />
-              <span className="hero__punto" />
-              <span className="hero__punto" />
-            </div>
-            <h1 className="hero__titulo">EcoCreaciones</h1>
+            <Emblema tamano={96} className="hero__emblema" />
+            <h1 className="hero__titulo">
+              <span className="hero__sabor">Sabor</span><span className="hero__puro">Puro</span>
+            </h1>
             <p className="hero__sub">{marca.descriptor}</p>
             <p className="plomo">
               Mora, azúcar y limón. Nada más. Hecha por {marca.razonSocial} en {marca.localidad},

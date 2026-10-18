@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Emblema } from './Logo';
 
 const ENLACES = [
   { href: '/#proceso', texto: 'El proceso' },
@@ -16,7 +17,7 @@ export default function Nav() {
 
   useEffect(() => {
     try {
-      const guardado = localStorage.getItem('eco-tema');
+      const guardado = localStorage.getItem('puro-tema');
       if (guardado === 'dark' || guardado === 'light') setTema(guardado);
     } catch {}
   }, []);
@@ -48,16 +49,18 @@ export default function Nav() {
     document.documentElement.dataset.theme = siguiente;
     setTema(siguiente);
     try {
-      localStorage.setItem('eco-tema', siguiente);
+      localStorage.setItem('puro-tema', siguiente);
     } catch {}
   }
 
   return (
     <nav className="nav no-imprimir">
       <div className="envoltura nav__interior">
-        <a className="nav__marca" href="/" aria-label="EcoCreaciones, inicio">
-          <span className="nav__hoja" aria-hidden="true">&#10087;</span>
-          EcoCreaciones
+        <a className="nav__marca" href="/" aria-label="SaborPuro, inicio">
+          <Emblema tamano={30} className="nav__emblema" />
+          <span className="marca-wm">
+            <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
+          </span>
         </a>
 
         <div className="nav__enlaces">

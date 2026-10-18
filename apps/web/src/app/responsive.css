@@ -223,7 +223,7 @@ img, svg, video, canvas {
 }
 
 /* ------------------------------------------------ corrección de desborde
-   "EcoCreaciones" es una sola palabra larga: a tamaños grandes no cabe en
+   "SaborPuro" es una sola palabra larga: a tamaños grandes no cabe en
    una pantalla de teléfono y empujaba el layout 54px hacia la derecha. */
 
 .hero__titulo {

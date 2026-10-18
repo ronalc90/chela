@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import { construirEtiqueta } from '@chela/brand/etiqueta';
 import { svgSello } from '@chela/brand/nutricional';
-import { marca } from '@chela/brand/tokens';
 
 /**
  * La etiqueta montada sobre la foto real del frasco.
@@ -56,23 +55,25 @@ export default function FrascoConEtiqueta({ foto = '/fotos/frasco-01.jpg' }) {
           aria-hidden={!mostrar}
         >
           <div className="envoltura-etq__papel">
-            <div className="envoltura-etq__texto">
-              <p className="envoltura-etq__marca">
-                <span className="envoltura-etq__hoja">&#10087;</span>
-                {marca.nombre}
-              </p>
-              <p className="envoltura-etq__denom">{etiqueta.frente.denominacion}</p>
-              <p className="envoltura-etq__peso">{etiqueta.frente.contenidoNeto}</p>
-              <p className="envoltura-etq__lote">
-                Lote {etiqueta.reverso.lote} · Vence {etiqueta.reverso.fechaVencimiento}
-              </p>
+            <div className="envoltura-etq__fila">
+              <div className="envoltura-etq__texto">
+                <p className="envoltura-etq__marca">
+                  <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
+                </p>
+                <p className="envoltura-etq__denom">{etiqueta.frente.denominacion}</p>
+                <p className="envoltura-etq__peso">{etiqueta.frente.contenidoNeto}</p>
+              </div>
+              {sello ? (
+                <div
+                  className="envoltura-etq__sello"
+                  dangerouslySetInnerHTML={{ __html: sello }}
+                />
+              ) : null}
             </div>
-            {sello ? (
-              <div
-                className="envoltura-etq__sello"
-                dangerouslySetInnerHTML={{ __html: sello }}
-              />
-            ) : null}
+            {/* A lo ancho: si compite con el sello, se corta. */}
+            <p className="envoltura-etq__lote">
+              Lote {etiqueta.reverso.lote} · Vence {etiqueta.reverso.fechaVencimiento}
+            </p>
           </div>
           {/* Sombras laterales y brillo central: el frasco es un cilindro. */}
           <div className="envoltura-etq__curva" aria-hidden="true" />

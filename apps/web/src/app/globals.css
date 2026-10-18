@@ -1,20 +1,20 @@
 /* ==========================================================================
-   EcoCreaciones — sistema de diseño
+   SaborPuro — sistema de diseño
    Morados de la mora sobre verdes de huerta, con una cuadrícula tenue de
    fondo que evoca el papel donde se bocetó la primera etiqueta.
    ========================================================================== */
 
 :root {
   /* Morados de la mora */
-  --c-mora: #3e1026;
-  --c-moraClara: #6e2245;
-  --c-moraBrillante: #9c2f5e;
-  --c-pulpa: #c44b7b;
+  --c-mora: #3A0E24;
+  --c-moraClara: #68203F;
+  --c-moraBrillante: #A32C63;
+  --c-pulpa: #D6457E;
 
-  /* Verdes de huerta: el acento de EcoCreaciones */
-  --c-hoja: #2f6b42;
-  --c-hojaClara: #5fa573;
-  --c-brote: #8fc79a;
+  /* Ámbar de miel: el acento cálido que contrasta con la mora */
+  --c-ambarHondo: #B57618;
+  --c-ambar: #E8A33D;
+  --c-ambarClaro: #F6CE87;
 
   --c-tapa: #d9a521;
   --c-tierra: #8c5a3c;
@@ -190,15 +190,11 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   line-height: 0.92;
   letter-spacing: -0.045em;
   margin-bottom: 0.15em;
-  background: linear-gradient(135deg, var(--c-mora) 0%, var(--c-moraBrillante) 55%, var(--c-pulpa) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 :root[data-theme='dark'] .hero__titulo,
 :root:not([data-theme='light']) .hero__titulo {
-  background: linear-gradient(135deg, #f6d9e4 0%, var(--c-pulpa) 60%, var(--c-hojaClara) 100%);
+  background: linear-gradient(135deg, #f6d9e4 0%, var(--c-pulpa) 60%, var(--c-ambar) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -217,10 +213,6 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   animation: flotar 3.4s ease-in-out infinite;
 }
 
-.hero__punto:nth-child(1) { background: var(--c-pulpa); animation-delay: 0s; }
-.hero__punto:nth-child(2) { background: var(--c-hojaClara); animation-delay: 0.3s; }
-.hero__punto:nth-child(3) { background: var(--c-hoja); animation-delay: 0.6s; }
-.hero__punto:nth-child(4) { background: var(--c-brote); animation-delay: 0.9s; }
 
 @keyframes flotar {
   0%, 100% { transform: translateY(0) scale(1); }
@@ -376,11 +368,11 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   font-size: 0.8rem;
   padding: 4px 11px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--c-hoja) 16%, transparent);
-  color: var(--c-hoja);
+  background: color-mix(in srgb, var(--c-ambarHondo) 16%, transparent);
+  color: var(--c-ambarHondo);
 }
 
-:root[data-theme='dark'] .paso__dato { color: var(--c-hoja); }
+:root[data-theme='dark'] .paso__dato { color: var(--c-ambarHondo); }
 
 /* -------------------------------------------------------------- etiqueta */
 
@@ -414,10 +406,6 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   margin: 0;
 }
 
-.etiqueta__marca span:nth-child(1) { color: var(--c-brote); }
-.etiqueta__marca span:nth-child(2) { color: var(--c-hojaClara); }
-.etiqueta__marca span:nth-child(3) { color: var(--c-hoja); }
-.etiqueta__marca span:nth-child(4) { color: var(--c-pulpa); }
 
 .etiqueta__puntos { display: flex; gap: 6px; margin-bottom: 8px; }
 .etiqueta__puntos i { width: 11px; height: 11px; border-radius: 50%; display: block; }
@@ -456,8 +444,8 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
 
 .etiqueta__campo:hover,
 .etiqueta__campo:focus-visible {
-  background: color-mix(in srgb, var(--c-hojaClara) 20%, transparent);
-  outline-color: var(--c-hojaClara);
+  background: color-mix(in srgb, var(--c-ambar) 20%, transparent);
+  outline-color: var(--c-ambar);
 }
 
 .etiqueta__campo[data-obligatorio='si']::after {
@@ -510,7 +498,7 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
 .explica {
   background: var(--fondo-alt);
   border: 1.5px solid var(--borde);
-  border-left: 4px solid var(--c-hojaClara);
+  border-left: 4px solid var(--c-ambar);
   border-radius: var(--radio);
   padding: 18px 20px;
   min-height: 128px;
@@ -599,8 +587,8 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   margin-top: 22px;
   padding: 14px 18px;
   border-radius: var(--radio);
-  border-left: 4px solid var(--c-hojaClara);
-  background: color-mix(in srgb, var(--c-hojaClara) 11%, transparent);
+  border-left: 4px solid var(--c-ambar);
+  background: color-mix(in srgb, var(--c-ambar) 11%, transparent);
   font-size: 0.92rem;
 }
 
@@ -689,10 +677,6 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
   color: var(--texto);
 }
 
-.nav__marca span:nth-child(1) { color: var(--c-brote); }
-.nav__marca span:nth-child(2) { color: var(--c-hojaClara); }
-.nav__marca span:nth-child(3) { color: var(--c-hoja); }
-.nav__marca span:nth-child(4) { color: var(--c-pulpa); }
 
 .nav__enlaces { display: flex; gap: 20px; align-items: center; }
 
@@ -765,7 +749,115 @@ code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
 }
 
 .pastilla--alerta {
-  border-color: var(--c-hojaClara);
-  color: var(--c-hojaClara);
-  background: color-mix(in srgb, var(--c-hojaClara) 10%, transparent);
+  border-color: var(--c-ambar);
+  color: var(--c-ambar);
+  background: color-mix(in srgb, var(--c-ambar) 10%, transparent);
 }
+
+/* ==========================================================================
+   Logotipo SaborPuro
+   "Sabor" pesado en mora, "Puro" ligero en ámbar: el nombre se lee como
+   dos palabras aunque vaya pegado, sin necesidad de espacio ni guion.
+   ========================================================================== */
+
+.marca-wm { display: inline-flex; align-items: baseline; white-space: nowrap; }
+
+.marca-wm__sabor,
+.hero__sabor,
+.etq__sabor {
+  font-family: var(--f-titulo);
+  font-weight: 900;
+  color: var(--c-mora);
+  letter-spacing: -0.025em;
+}
+
+.marca-wm__puro,
+.hero__puro,
+.etq__puro {
+  font-family: var(--f-titulo);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--c-ambarHondo);
+  letter-spacing: -0.01em;
+}
+
+:root[data-theme='dark'] .marca-wm__sabor,
+:root[data-theme='dark'] .hero__sabor { color: var(--c-crema); }
+
+:root[data-theme='dark'] .marca-wm__puro,
+:root[data-theme='dark'] .hero__puro { color: var(--c-ambar); }
+
+/* La etiqueta impresa es siempre sobre papel blanco. */
+.etq__sabor { color: #3A0E24; }
+.etq__puro { color: #B57618; }
+
+/* --------------------------------------------------- en la barra superior */
+
+.nav__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 1.35rem;
+  text-decoration: none;
+}
+
+.nav__emblema { flex-shrink: 0; }
+
+@media not (prefers-reduced-motion: reduce) {
+  .nav__emblema {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav__marca:hover .nav__emblema {
+    transform: rotate(-8deg) scale(1.1);
+  }
+}
+
+/* ------------------------------------------------------------- en el hero */
+
+.hero__emblema { margin-bottom: 14px; }
+
+.hero__titulo .hero__sabor,
+.hero__titulo .hero__puro {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+}
+
+/* ------------------------------------------- en la etiqueta interactiva */
+
+.etiqueta__marca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.etiqueta__emblema { flex-shrink: 0; }
+
+/* ----------------------------------------------- en la etiqueta impresa */
+
+.etq__marca {
+  display: flex;
+  align-items: center;
+  gap: 1.6mm;
+}
+
+.etq__emblema { flex-shrink: 0; width: 13cqw; height: auto; }
+
+/* ------------------------------------------------- bloque apilado */
+
+.logotipo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.logotipo__nombre {
+  font-size: 1.6rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* El emblema de la etiqueta impresa se mide contra el ancho del rótulo. */
+.etq__emblema { flex-shrink: 0; width: 8.4cqw; height: auto; }
