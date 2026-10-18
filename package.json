@@ -1,0 +1,20 @@
+{
+  "name": "chela",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Mermelada artesanal de mora — sitio web, trazabilidad de lotes y generacion de etiquetas",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=@chela/web",
+    "dev:api": "npm run dev --workspace=@chela/api",
+    "build:web": "npm run build --workspace=@chela/web",
+    "build:api": "npm run build --workspace=@chela/api",
+    "test": "node --test packages/brand/test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

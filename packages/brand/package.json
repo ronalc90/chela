@@ -1,0 +1,15 @@
+{
+  "name": "@chela/brand",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./tokens": "./src/tokens.js",
+    "./barcode": "./src/barcode.js",
+    "./lote": "./src/lote.js",
+    "./nutricional": "./src/nutricional.js",
+    "./etiqueta": "./src/etiqueta.js"
+  }
+}
