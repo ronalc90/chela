@@ -144,17 +144,11 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
               ))}
             </div>
 
-            <div className="etiqueta__puntos" aria-hidden="true">
-              <i style={{ background: 'var(--c-puntoRosa)' }} />
-              <i style={{ background: 'var(--c-puntoNaranja)' }} />
-              <i style={{ background: 'var(--c-puntoVerde)' }} />
-              <i style={{ background: 'var(--c-puntoAzul)' }} />
-            </div>
-
             <h3 className="etiqueta__marca">
               {campo('marca', (
                 <>
-                  <span>G</span><span>a</span><span>R</span><span>o</span>
+                  <span className="etiqueta__hoja" aria-hidden="true">❧</span>
+                  EcoCreaciones
                 </>
               ))}
             </h3>
@@ -221,7 +215,8 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
           exige la norma en ese punto. Los puntos rosados marcan los campos obligatorios.
         </p>
 
-        <table className="tabla-nut" style={{ marginTop: 26 }}>
+        <div className="tabla-marco" style={{ marginTop: 26 }}>
+        <table className="tabla-nut">
           <caption>Información nutricional</caption>
           <thead>
             <tr>
@@ -268,6 +263,7 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <div className="aviso">{etiqueta.advertencia}</div>
       </div>

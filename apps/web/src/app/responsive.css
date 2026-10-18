@@ -1,0 +1,256 @@
+/* ==========================================================================
+   Responsive y navegación móvil
+   Se carga al final para poder corregir lo que definieron las otras hojas.
+   ========================================================================== */
+
+/* ------------------------------------------------------- barra de navegación */
+
+.nav__acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.hamburguesa {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border: 1.5px solid var(--borde);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hamburguesa__linea {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--texto);
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s;
+}
+
+.hamburguesa__linea--x1 { transform: translateY(7px) rotate(45deg); }
+.hamburguesa__linea--x2 { transform: translateY(-7px) rotate(-45deg); }
+.hamburguesa__linea--oculta { opacity: 0; }
+
+.menu-movil {
+  display: none;
+  flex-direction: column;
+  padding: 10px var(--gutter) 26px;
+  border-top: 1px solid var(--borde);
+  background: var(--fondo);
+}
+
+.menu-movil a {
+  display: block;
+  padding: 15px 4px;
+  font-family: var(--f-titulo);
+  font-size: 1.25rem;
+  color: var(--texto);
+  text-decoration: none;
+  border-bottom: 1px solid var(--borde);
+}
+
+.menu-movil a:last-child { border-bottom: none; }
+
+@media not (prefers-reduced-motion: reduce) {
+  .menu-movil--abierto a {
+    animation: subir 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--n, 0) * 55ms);
+  }
+}
+
+@media (max-width: 860px) {
+  .nav__enlaces { display: none; }
+  .hamburguesa { display: flex; }
+  .menu-movil--abierto { display: flex; }
+
+  .nav__interior { padding-block: 10px; }
+  .nav__marca { font-size: 1.08rem; }
+}
+
+@media (min-width: 861px) {
+  .menu-movil { display: none !important; }
+}
+
+/* --------------------------------------------------------------- hero */
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding-block: 48px 56px;
+  }
+
+  .hero__rejilla { gap: 36px; }
+
+  /* En móvil la foto va primero: es lo que vende el producto. */
+  .hero__rejilla > :last-child { order: -1; }
+
+  .montaje__figura { max-width: 420px; margin-inline: auto; }
+}
+
+@media (max-width: 560px) {
+  .hero__titulo { font-size: clamp(2.8rem, 15vw, 4rem); }
+  .hero__sub { font-size: 1.15rem; }
+  .botonera { gap: 10px; }
+  .botonera .boton { flex: 1 1 100%; justify-content: center; }
+}
+
+/* ------------------------------------------------------------ secciones */
+
+@media (max-width: 560px) {
+  .seccion { padding-block: 52px; }
+  body { font-size: 16px; }
+
+  .paso { padding-left: 54px; padding-block: 14px; }
+  .paso__numero { width: 38px; height: 38px; font-size: 0.82rem; top: 16px; }
+  .pasos::before { left: 19px; }
+}
+
+/* ----------------------------------------------------- tablas y etiqueta */
+
+/* Cualquier tabla ancha puede desplazarse sola en vez de romper el layout. */
+.tabla-marco {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 480px) {
+  .tabla-nut { font-size: 0.78rem; }
+  .tabla-nut th, .tabla-nut td { padding: 6px 7px; }
+}
+
+@media (max-width: 420px) {
+  /* El sello se encoge para no tapar la marca en pantallas angostas. */
+  .etiqueta__sello { width: 58px; }
+  .etiqueta__sellos { top: 8px; right: 8px; }
+  .etiqueta__cara { padding: 16px; }
+  .etiqueta__barras { width: 124px; }
+  .etiqueta__pie { gap: 10px; }
+}
+
+/* ------------------------------------------- generador: hoja de etiquetas */
+
+.hoja-marco {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+
+/* En móvil la hoja se ve reducida para que quepa; al imprimir vuelve a
+   tamaño real, porque la regla de impresión anula esta escala. */
+@media (max-width: 760px) {
+  .hoja {
+    transform: scale(0.72);
+    transform-origin: 0 0;
+    width: 139%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hoja {
+    transform: scale(0.56);
+    width: 179%;
+  }
+}
+
+@media print {
+  .hoja {
+    transform: none !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .herramienta { gap: 24px; }
+  .panel { padding: 18px; }
+}
+
+@media (max-width: 420px) {
+  .panel__grupo { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------ objetivos táctiles */
+
+@media (hover: none) {
+  .boton { padding: 15px 24px; }
+
+  .campo input, .campo select { padding: 13px 14px; font-size: 16px; }
+
+  /* 16px evita que iOS haga zoom al enfocar un campo. */
+  .etiqueta__campo { padding: 5px 6px; }
+
+  /* Sin hover, el reflejo y la inclinación no aplican. */
+  .inclinable::after { display: none; }
+}
+
+/* ------------------------------------------------------------ galería */
+
+@media (max-width: 560px) {
+  .galeria { grid-template-columns: 1fr; }
+  .galeria img { height: 260px; }
+}
+
+/* ---------------------------------------------------------------- pie */
+
+@media (max-width: 560px) {
+  .pie { padding-block: 36px 28px; }
+  .pie__rejilla { gap: 22px; grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 380px) {
+  .pie__rejilla { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------- nada se sale de la pantalla */
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+.envoltura { overflow-wrap: break-word; }
+
+/* El montaje del frasco mantiene proporción en cualquier ancho. */
+@media (max-width: 420px) {
+  .envoltura-etq__lote { font-size: 5.2cqw; }
+}
+
+/* ------------------------------------------------ corrección de desborde
+   "EcoCreaciones" es una sola palabra larga: a tamaños grandes no cabe en
+   una pantalla de teléfono y empujaba el layout 54px hacia la derecha. */
+
+.hero__titulo {
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 760px) {
+  .hero__titulo { font-size: clamp(2rem, 10vw, 3.4rem); }
+}
+
+@media (max-width: 420px) {
+  .hero__titulo { font-size: clamp(1.75rem, 9.2vw, 2.6rem); }
+}
+
+/* Red de seguridad: ningún hijo puede ensanchar la página. */
+html, body { max-width: 100%; }
+
+h1, h2, h3, .plomo, .paso__texto, .montaje__nota {
+  overflow-wrap: break-word;
+}
+
+/* ----------------------------------------------------- red de seguridad
+   Varias animaciones de entrada arrancan desplazadas o escaladas y, con
+   fill `both`, mantienen ese fotograma mientras el elemento espera fuera
+   de pantalla. En vertical no molesta; en horizontal crearía una barra de
+   desplazamiento. `clip` corta ese eje sin romper position: sticky, cosa
+   que `hidden` sí haría. */
+body {
+  overflow-x: clip;
+}

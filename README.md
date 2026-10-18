@@ -1,14 +1,22 @@
-# GaRo — Mermelada de mora casera
+# EcoCreaciones — Mermelada artesanal de mora
 
-Sitio web, trazabilidad de lotes y generación de etiquetas para la mermelada
-de mora elaborada por **Mujeres Usmeñas** en Usme, Bogotá D.C.
+Sitio web, trazabilidad de lotes y generador de etiquetas para imprimir,
+de la mermelada de mora elaborada por **Mujeres Usmeñas** en Usme,
+Bogotá D.C.
 
-El proyecto digitaliza una etiqueta que originalmente se dibujó a mano sobre
-papel cuadriculado: conserva los mismos datos, pero ahora el código de barras
-es un EAN-13 con dígito verificador real, el lote se genera solo y la fecha de
-vencimiento se calcula desde la fecha de producción.
+**Dominio:** https://ecocreaciones.com
 
-**Dominio:** saborpuro.lat
+## Qué hace
+
+- **Sitio público** — el proceso de elaboración paso a paso, una etiqueta
+  interactiva que explica qué norma exige cada campo, un planeador de
+  tandas que recalcula en vivo, y consulta de trazabilidad por lote.
+- **Generador de etiquetas** (`/etiquetas`) — llenas los datos de la tanda
+  y sale una hoja A4 lista para papel adhesivo. Tres tamaños de etiqueta.
+  El lote, el vencimiento, la tabla nutricional y el código de barras se
+  calculan solos desde la receta.
+- **API de trazabilidad** — registra cada tanda y permite devolver
+  cualquier frasco a su día de producción.
 
 ## Estructura
 
@@ -18,7 +26,7 @@ apps/api        Fastify + PostgreSQL — trazabilidad → Railway
 packages/brand  Lógica compartida y tokens de marca
 ```
 
-`packages/brand` es el corazón del proyecto. Contiene:
+`packages/brand` es el corazón del proyecto:
 
 | Módulo | Qué hace |
 |---|---|
@@ -27,6 +35,10 @@ packages/brand  Lógica compartida y tokens de marca
 | `lote.js` | Códigos de lote, fechas de producción y vencimiento. |
 | `nutricional.js` | Perfil nutricional desde la receta y evaluación de sellos frontales. |
 | `etiqueta.js` | Arma la etiqueta completa y valida campos obligatorios. |
+
+Para cambiar el nombre, los colores, el NIT o el registro sanitario, se
+toca **solo `packages/brand/src/tokens.js`**: todo lo demás se actualiza
+con él.
 
 ## Desarrollo
 
@@ -53,6 +65,16 @@ npm test             # suite del paquete de marca
 | `CORS_ORIGINS` | Orígenes permitidos, separados por coma. Los `*.vercel.app` se permiten siempre. |
 | `PORT` | Lo asigna Railway. |
 
+## Imprimir etiquetas
+
+En `/etiquetas`, tras configurar la tanda, usa el botón de imprimir y en
+el diálogo del navegador **desactiva «ajustar a la página» y deja la
+escala en 100 %**. Las etiquetas están medidas en milímetros, así que
+cualquier reescalado las saca de tamaño.
+
+La hoja imprime solo las etiquetas: el panel, el menú y los fondos se
+ocultan automáticamente.
+
 ## Marco normativo
 
 La etiqueta sigue:
@@ -72,19 +94,22 @@ La etiqueta sigue:
    declaración de propiedad nutricional o de salud** en la etiqueta.
 
 2. **El código de barras actual no sirve para retail.** Usa prefijo interno
-   `200`, válido para control propio. Un GTIN comercial lo asigna GS1 Colombia
-   (LOGYCA); el prefijo de país es `770`.
+   `200`, válido para control propio. Un GTIN comercial lo asigna GS1
+   Colombia (LOGYCA); el prefijo de país es `770`.
 
-## Pendientes antes de imprimir
+## Pendientes antes de imprimir en serio
 
 - [ ] **NIT** de la organización.
-- [ ] **Teléfono:** el tablero dice `311 583 9051`; la etiqueta a mano,
+- [ ] **Teléfono:** hay dos versiones en las fuentes, `311 583 9051` y
       `321 383 8226`. Definir cuál va.
-- [ ] **Registro sanitario:** el tablero dice `NSA-8520-951`; la etiqueta a
-      mano, `RSA 11783305`. Definir cuál es el vigente.
+- [ ] **Registro sanitario:** hay dos versiones, `NSA-8520-951` y
+      `RSA 11783305`. Definir cuál es el vigente.
 - [ ] **Análisis bromatológico** de laboratorio para la tabla nutricional real.
 - [ ] **Prefijo GS1** si el producto va a supermercados.
 - [ ] **Verificación del nombre** en la base de signos distintivos de la SIC.
+
+El generador marca estos pendientes en pantalla mientras sigan sin
+resolverse.
 
 Los valores nutricionales del sitio son estimaciones calculadas desde la
 receta. No sustituyen un análisis de laboratorio.

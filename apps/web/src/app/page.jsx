@@ -3,14 +3,12 @@ import Proceso from '@/components/Proceso';
 import EtiquetaViva from '@/components/EtiquetaViva';
 import Calculadora from '@/components/Calculadora';
 import Trazabilidad from '@/components/Trazabilidad';
+import FrascoConEtiqueta from '@/components/FrascoConEtiqueta';
 import { marca, producto } from '@chela/brand/tokens';
 
 const FOTOS = [
   { src: '/fotos/frasco-01.jpg', pie: 'El frasco terminado, sellado al vacío con tapa metálica.' },
   { src: '/fotos/frasco-02.jpg', pie: 'La mora conserva la semilla: textura de mermelada casera, no de jalea.' },
-  { src: '/fotos/etiqueta-original-01.jpg', pie: 'La etiqueta original, dibujada a mano sobre papel cuadriculado.' },
-  { src: '/fotos/etiqueta-original-02.jpg', pie: 'El reverso: fabricante, lote, vencimiento y código de barras.' },
-  { src: '/fotos/referencia-norma.jpg', pie: 'El tablero de trabajo con los campos que exige la Resolución 5109 de 2005.' },
 ];
 
 export default function Pagina() {
@@ -28,7 +26,7 @@ export default function Pagina() {
               <span className="hero__punto" />
               <span className="hero__punto" />
             </div>
-            <h1 className="hero__titulo">GaRo</h1>
+            <h1 className="hero__titulo">EcoCreaciones</h1>
             <p className="hero__sub">{marca.descriptor}</p>
             <p className="plomo">
               Mora, azúcar y limón. Nada más. Hecha por {marca.razonSocial} en {marca.localidad},
@@ -37,18 +35,11 @@ export default function Pagina() {
             </p>
             <div className="botonera">
               <a className="boton" href="#proceso">Ver el proceso</a>
-              <a className="boton boton--fantasma" href="#trazabilidad">Verificar mi lote</a>
+              <a className="boton boton--fantasma" href="/etiquetas">Generar etiquetas</a>
             </div>
           </div>
 
-          <figure className="hero__foto" style={{ margin: 0 }}>
-            <img
-              src="/fotos/frasco-01.jpg"
-              alt="Frasco de mermelada de mora GaRo con tapa dorada, sobre una mesa de vidrio"
-              width="900"
-              height="1200"
-            />
-          </figure>
+          <FrascoConEtiqueta />
         </div>
       </header>
 
@@ -99,6 +90,19 @@ export default function Pagina() {
             tanda, con qué proporciones y hasta cuándo rinde.
           </p>
           <Trazabilidad />
+        </div>
+      </section>
+
+      <section className="seccion" id="imprimir">
+        <div className="envoltura">
+          <span className="rotulo">Para producción</span>
+          <h2 className="anim-subir">Imprime las etiquetas de cada tanda</h2>
+          <p className="plomo" style={{ marginBottom: 32 }}>
+            Metes los datos de la tanda y sale una hoja A4 lista para papel adhesivo, con el lote,
+            el vencimiento, la tabla nutricional y el código de barras ya calculados. Tres tamaños
+            según el frasco.
+          </p>
+          <a className="boton" href="/etiquetas">Abrir el generador</a>
         </div>
       </section>
 

@@ -1,45 +1,45 @@
 /**
  * Identidad de marca — ARCHIVO UNICO DE CONFIGURACION.
  *
- * Los datos salen de la etiqueta hecha a mano y del tablero de referencia
- * (Resolucion 5109 de 2005). Cambiar algo aqui se propaga a la web, a la
- * etiqueta digital, al sticker y al libro de recetas sin tocar nada mas.
+ * Cambiar algo aqui se propaga a la web, a la etiqueta digital, al
+ * generador de etiquetas para imprimir y al libro de recetas sin tocar
+ * nada mas.
  *
- * PENDIENTES POR RESOLVER (hay dos versiones distintas en las fuentes):
- *  - Telefono: 311 583 9051 (tablero) vs 321 383 8226 (etiqueta a mano).
- *  - Registro sanitario: NSA-8520-951 (tablero) vs RSA 11783305 (etiqueta).
- *  - Direccion: TV 7D 67-80 sur, Monteblanco (tablero) vs la version de la
- *    etiqueta, que no se alcanza a leer completa en la foto.
- * Los campos marcados VERIFICAR usan la version del tablero, que es la que
- * sigue la norma, pero hay que confirmarlos antes de mandar a imprenta.
+ * PENDIENTES POR RESOLVER antes de mandar a imprenta:
+ *  - NIT de la organizacion.
+ *  - Telefono: hay dos versiones en las fuentes originales,
+ *    311 583 9051 y 321 383 8226.
+ *  - Registro sanitario: hay dos versiones, NSA-8520-951 y RSA 11783305.
+ *    Son formatos distintos y solo uno puede ser el vigente.
  */
 
+export const SITIO = 'https://ecocreaciones.com';
+
 export const marca = {
-  nombre: 'GaRo',
-  nombreCorto: 'GaRo',
-  descriptor: 'Mermelada de mora casera',
-  eslogan: 'Hecha por mujeres usmeñas',
+  nombre: 'EcoCreaciones',
+  nombreCorto: 'EcoCreaciones',
+  descriptor: 'Mermelada artesanal de mora',
+  eslogan: 'Del cultivo a la mesa, sin atajos',
   razonSocial: 'Mujeres Usmeñas',
   nit: 'PENDIENTE — NIT',
   direccion: 'TV 7D 67-80 sur, Monteblanco',
   localidad: 'Usme',
   ciudad: 'Bogotá D.C.',
   pais: 'Colombia',
-  // VERIFICAR: el tablero dice NSA-8520-951; la etiqueta a mano, RSA 11783305.
   registroSanitario: 'NSA-8520-951',
   registroSanitarioAlterno: 'RSA 11783305',
+  sitio: SITIO,
   contacto: {
-    // VERIFICAR: la etiqueta a mano trae 321 383 8226.
     telefono: '311 583 9051',
     telefonoAlterno: '321 383 8226',
     whatsapp: '+57 311 583 9051',
-    email: 'PENDIENTE — correo',
+    email: 'hola@ecocreaciones.com',
   },
 };
 
 export const producto = {
   denominacion: 'Mermelada de mora',
-  calificativo: 'Casera',
+  calificativo: 'Artesanal',
   // Orden decreciente de proporcion, con la funcion tecnologica del limon
   // declarada entre parentesis como exige el rotulado.
   ingredientes: [
@@ -56,24 +56,21 @@ export const producto = {
   referenciaEan: '10100',
 };
 
-/** Paleta: morados profundos de la mora, con los acentos vivos del logo a mano. */
+/** Paleta: morados de la mora sobre verdes de huerta. */
 export const colores = {
   mora: '#3E1026',
   moraClara: '#6E2245',
   moraBrillante: '#9C2F5E',
   pulpa: '#C44B7B',
-  // Los puntos de colores del logotipo dibujado a mano.
-  puntoRosa: '#E8617F',
-  puntoNaranja: '#F09A3E',
-  puntoVerde: '#4FB06A',
-  puntoAzul: '#4A9BC4',
-  tapa: '#D9A521',
+  hoja: '#2F6B42',
+  hojaClara: '#5FA573',
+  brote: '#8FC79A',
   tierra: '#8C5A3C',
-  hoja: '#3F5D3A',
-  crema: '#F7F0E4',
-  cremaOscura: '#E8DCC8',
-  papel: '#FDFBF5',
-  tinta: '#2A1A20',
+  tapa: '#D9A521',
+  crema: '#F6F2E7',
+  cremaOscura: '#E5DECB',
+  papel: '#FCFBF6',
+  tinta: '#241B1E',
 };
 
 export const tipografia = {
@@ -87,8 +84,8 @@ export const tipografia = {
 export const espaciado = {
   radio: '14px',
   radioGrande: '28px',
-  sombra: '0 2px 8px rgba(42, 26, 32, 0.08), 0 12px 32px rgba(42, 26, 32, 0.10)',
-  sombraFuerte: '0 4px 16px rgba(42, 26, 32, 0.16), 0 24px 56px rgba(42, 26, 32, 0.18)',
+  sombra: '0 2px 8px rgba(36, 27, 30, 0.08), 0 12px 32px rgba(36, 27, 30, 0.10)',
+  sombraFuerte: '0 4px 16px rgba(36, 27, 30, 0.16), 0 24px 56px rgba(36, 27, 30, 0.18)',
 };
 
 /** Texto de la lista de ingredientes tal como va impreso. */
