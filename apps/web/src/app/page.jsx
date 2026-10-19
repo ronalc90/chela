@@ -123,9 +123,9 @@ export default function Pagina() {
               <span className="rotulo">Para producción</span>
               <h2>Imprime las etiquetas de cada tanda</h2>
               <p className="plomo">
-                Metes los datos de la tanda y sale una hoja A4 lista para papel adhesivo, con el
-                lote, el vencimiento, la tabla nutricional y el código de barras ya calculados. Tres
-                tamaños según el frasco.
+                Cambias lo que quieras del rótulo y sale la hoja lista para papel adhesivo, con el
+                lote, el vencimiento y el código de barras ya calculados. El tamaño de la etiqueta y
+                de la hoja los eliges tú, al milímetro.
               </p>
               <div className="botonera">
                 <a className="boton boton--ambar" href="/etiquetas">

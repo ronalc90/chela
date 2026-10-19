@@ -1,6 +1,7 @@
 import './globals.css';
 import './animaciones.css';
 import './impresion.css';
+import './editor.css';
 import './responsive.css';
 import { marca, producto, tipografia } from '@chela/brand/tokens';
 

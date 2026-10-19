@@ -236,46 +236,21 @@
   .etiqueta__pie { gap: 10px; }
 }
 
-/* ------------------------------------------- generador: hoja de etiquetas */
+/* ------------------------------------------- generador de etiquetas */
 
-.hoja-marco {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 6px;
+/* La vista previa ya se reduce sola en Hojas.jsx (mide el ancho real y
+   aplica la escala), así que aquí solo hace falta que nada se salga. */
+.hojas, .hojas__item, .hojas__escala { max-width: 100%; }
+
+@media (max-width: 1039px) {
+  /* En una sola columna la barra pegajosa ocupa menos alto. */
+  .gen__barra { padding: 10px 12px; }
 }
 
-/* En móvil la hoja se ve reducida para que quepa; al imprimir vuelve a
-   tamaño real, porque la regla de impresión anula esta escala. */
-@media (max-width: 760px) {
-  .hoja {
-    transform: scale(0.72);
-    transform-origin: 0 0;
-    width: 139%;
-    padding: 10px;
-  }
-}
-
-@media (max-width: 420px) {
-  .hoja {
-    transform: scale(0.56);
-    width: 179%;
-  }
-}
-
-@media print {
-  .hoja {
-    transform: none !important;
-    width: 100% !important;
-  }
-}
-
-@media (max-width: 900px) {
-  .herramienta { gap: 24px; }
-  .panel { padding: 20px; }
-}
-
-@media (max-width: 420px) {
-  .panel__grupo { grid-template-columns: 1fr; }
+@media (max-width: 560px) {
+  .gen__barra { gap: 10px; }
+  .gen__barra .boton { flex: 1 1 100%; }
+  .gen__pastillas { font-size: 0.95em; }
 }
 
 /* ------------------------------------------------ objetivos táctiles */
@@ -284,7 +259,7 @@
   .boton { padding: 15px 24px; }
 
   /* 16px evita que iOS haga zoom al enfocar un campo. */
-  .campo input, .campo select { padding: 13px 14px; font-size: 16px; }
+  .campo input, .campo select, .campo textarea { padding: 13px 14px; font-size: 16px; }
 
   .etiqueta__campo { padding: 5px 6px; }
 }
