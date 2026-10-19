@@ -7,6 +7,7 @@ import { generarLote, parsearLote, aIso } from '@chela/brand/lote';
 import { perfilNutricional, evaluarSellos, svgSello } from '@chela/brand/nutricional';
 
 import { consultar, migrar } from './db.js';
+import rutasEtiquetas from './etiquetas.js';
 
 const app = Fastify({
   logger: { level: process.env.LOG_LEVEL || 'info' },
@@ -77,6 +78,11 @@ app.get('/', async () => ({
     'GET  /api/sello.svg',
     'POST /api/calcular',
     'POST /api/pedidos',
+    'GET  /api/etiquetas            (X-Clave)',
+    'POST /api/etiquetas            (X-Clave)',
+    'GET  /api/etiquetas/:id        (X-Clave)',
+    'PUT  /api/etiquetas/:id        (X-Clave)',
+    'DELETE /api/etiquetas/:id      (X-Clave)',
   ],
 }));
 
@@ -196,6 +202,10 @@ app.post('/api/calcular', async (req, reply) => {
     return reply.code(400).send({ error: e.message });
   }
 });
+
+// ------------------------------------------------------------- etiquetas
+
+await app.register(rutasEtiquetas, { prefix: '/api/etiquetas' });
 
 // -------------------------------------------------------------- pedidos
 

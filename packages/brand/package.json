@@ -10,6 +10,7 @@
     "./barcode": "./src/barcode.js",
     "./lote": "./src/lote.js",
     "./nutricional": "./src/nutricional.js",
-    "./etiqueta": "./src/etiqueta.js"
+    "./etiqueta": "./src/etiqueta.js",
+    "./plantilla": "./src/plantilla.js"
   }
 }

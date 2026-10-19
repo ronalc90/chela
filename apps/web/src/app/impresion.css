@@ -1,31 +1,19 @@
 /* ==========================================================================
-   Hoja de etiquetas para imprimir
+   Etiquetas para imprimir
    Todo se mide en milímetros porque el resultado va a papel adhesivo y
-   tiene que salir a tamaño real. 1mm en CSS = 1mm en el papel siempre que
-   el navegador imprima al 100% (sin "ajustar a página").
+   tiene que salir a tamaño real. 1 mm en CSS = 1 mm en el papel siempre
+   que el navegador imprima al 100 % (sin «ajustar a la página»).
+
+   La tipografía escala con el ancho de la etiqueta (cqw) y además con
+   --escala, el «tamaño del texto» que elige la persona en el editor.
    ========================================================================== */
-
-.hoja {
-  --etq-ancho: 70mm;
-  --etq-alto: 50mm;
-  --etq-gap: 4mm;
-
-  display: grid;
-  grid-template-columns: repeat(auto-fill, var(--etq-ancho));
-  gap: var(--etq-gap);
-  justify-content: center;
-  background: #ffffff;
-  padding: 8mm;
-  border-radius: var(--radio-g);
-  border: 1px solid var(--borde);
-  box-shadow: var(--sombra-f);
-}
 
 /* ------------------------------------------------------- la etiqueta física */
 
 .etq {
-  width: var(--etq-ancho);
-  height: var(--etq-alto);
+  --escala: 1;
+  width: var(--etq-ancho, 70mm);
+  height: var(--etq-alto, 50mm);
   box-sizing: border-box;
   padding: 2.8mm 3.2mm;
   background: #ffffff;
@@ -37,13 +25,12 @@
   position: relative;
   overflow: hidden;
   font-family: var(--f-cuerpo);
-  /* La tipografía escala con el ancho de la etiqueta, para que el mismo
-     contenido obligatorio quepa en los tres formatos. */
   container-type: inline-size;
-  /* Evita que una etiqueta se parta entre dos páginas. */
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+.etq--sin-borde { border-color: transparent; }
 
 /* Guía de corte: solo se ve en pantalla, nunca se imprime. */
 .etq::before {
@@ -71,13 +58,15 @@
   line-height: 1;
 }
 
-.etq__emblema { width: 13.5cqw; height: auto; display: block; }
+.etq__emblema { width: calc(13.5cqw * var(--escala)); height: auto; display: block; }
 
 .etq__nombre {
-  font-size: 3.7cqw;
+  font-size: calc(3.7cqw * var(--escala));
   white-space: nowrap;
   margin-top: 0.2cqw;
 }
+
+.etq__marca--solo-nombre .etq__nombre { font-size: calc(5cqw * var(--escala)); }
 
 .etq__nombre .marca-wm__sabor { color: #3a0e24; }
 .etq__nombre .marca-wm__puro { color: #b57618; }
@@ -86,14 +75,14 @@
 
 .etq__denominacion {
   font-family: var(--f-titulo);
-  font-size: 4.2cqw;
+  font-size: calc(4.2cqw * var(--escala));
   font-weight: 700;
   margin: 0;
   line-height: 1.12;
 }
 
 .etq__calificativo {
-  font-size: 2.5cqw;
+  font-size: calc(2.5cqw * var(--escala));
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #6b5560;
@@ -102,30 +91,28 @@
 
 .etq__peso {
   font-family: var(--f-mono);
-  font-size: 3.6cqw;
+  font-size: calc(3.4cqw * var(--escala));
   font-weight: 600;
-  white-space: nowrap;
+  margin: 0.8mm 0 0;
 }
 
-.etq__sello {
-  width: 15cqw;
-  height: 15cqw;
-  flex-shrink: 0;
-}
-
+.etq__sellos { display: flex; gap: 1.2cqw; flex-shrink: 0; }
+.etq__sello { width: calc(15cqw * var(--escala)); height: calc(15cqw * var(--escala)); flex-shrink: 0; }
+.etq--varios-sellos .etq__sello { width: calc(10.5cqw * var(--escala)); height: calc(10.5cqw * var(--escala)); }
 .etq__sello svg { width: 100%; height: 100%; display: block; }
 
 .etq__cuerpo {
   margin-top: 1.1mm;
-  font-size: 2.12cqw;
+  font-size: calc(2.12cqw * var(--escala));
   line-height: 1.2;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-.etq__cuerpo p { margin: 0 0 0.55mm; }
+.etq__cuerpo p { margin: 0 0 0.55mm; overflow-wrap: break-word; }
 .etq__cuerpo strong { font-weight: 700; }
+.etq__leyenda { font-weight: 700; }
 
 .etq__pie {
   display: flex;
@@ -139,214 +126,79 @@
 
 .etq__codigos {
   font-family: var(--f-mono);
-  font-size: 2.4cqw;
+  font-size: calc(2.4cqw * var(--escala));
   line-height: 1.34;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
 }
 
-.etq__barras { width: 37cqw; flex-shrink: 0; }
+.etq__barras { width: calc(37cqw * var(--escala)); max-width: 50%; flex-shrink: 0; }
 .etq__barras svg { width: 100%; height: auto; display: block; }
+
+/* ------------------------------------------------------------- hojas */
+
+/* Una hoja de papel a tamaño real, con el margen por dentro. */
+.pagina {
+  width: var(--hoja-ancho);
+  /* Un pelo menos que la hoja: evita que el redondeo cree una página en
+     blanco entre hojas. */
+  height: calc(var(--hoja-alto) - 0.4mm);
+  padding: var(--hoja-margen);
+  box-sizing: border-box;
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: repeat(var(--columnas), var(--etq-ancho));
+  grid-auto-rows: var(--etq-alto);
+  gap: var(--etq-gap);
+  overflow: hidden;
+  break-after: page;
+  page-break-after: always;
+}
+
+.pagina:last-child { break-after: auto; page-break-after: auto; }
+
+/* Vista previa: las hojas se reducen para caber en la columna. */
+.hojas { display: grid; gap: 22px; justify-items: center; }
+.hojas__item { display: grid; gap: 8px; justify-items: center; }
+.hojas__numero { font-family: var(--f-mono); font-size: 0.72rem; color: var(--texto-suave); letter-spacing: 0.08em; text-transform: uppercase; }
+.hojas__escala { overflow: hidden; border-radius: 6px; box-shadow: var(--sombra-f); outline: 1px solid var(--borde); }
+
+/* La copia para imprimir no se ve en pantalla. */
+.raiz-impresion { display: none; }
 
 /* ------------------------------------------------------------- impresión */
 
-@page {
-  size: A4 portrait;
-  margin: 8mm;
-}
-
 @media print {
-  /* Nada de fondos ni cuadrículas: desperdician tinta y ensucian el corte. */
+  /* Solo sale la copia de impresión, que es hija directa de <body>. */
+  body > *:not(.raiz-impresion) { display: none !important; }
+
   html, body {
     background: #ffffff !important;
     background-image: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
     color: #000000;
-    margin: 0;
-    padding: 0;
   }
 
-  /* Solo se imprime la hoja de etiquetas. */
-  body * { visibility: hidden; }
-  .hoja, .hoja * { visibility: visible; }
+  .raiz-impresion { display: block !important; }
 
-  .hoja {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    width: 100%;
-    padding: 0;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    gap: var(--etq-gap);
-    justify-content: flex-start;
-  }
-
-  /* La guía de corte punteada no va al papel. */
   .etq::before { display: none; }
+  .etq { border-color: #000000; box-shadow: none; }
+  .etq--sin-borde { border-color: transparent; }
 
-  .etq {
-    border-color: #000000;
-    box-shadow: none;
-  }
-
-  /* Fuerza a imprimir el negro del sello, que si no sale en gris. */
   .etq__sello svg,
-  .etq__barras svg {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .etq__marca, .etq__marca svg {
+  .etq__barras svg,
+  .etq__marca,
+  .etq__marca svg {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .no-imprimir { display: none !important; }
 
-  /* Sin animaciones al imprimir. */
   *, *::before, *::after {
     animation: none !important;
     transition: none !important;
   }
-}
-
-/* --------------------------------------------------- panel de la herramienta */
-
-.herramienta {
-  display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
-  gap: clamp(20px, 3vw, 36px);
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .herramienta { grid-template-columns: 1fr; }
-}
-
-.panel {
-  position: sticky;
-  top: calc(var(--alto-nav, 70px) + 16px);
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-g);
-  padding: 24px;
-  box-shadow: var(--sombra);
-}
-
-@media (max-width: 900px) {
-  .panel { position: static; }
-}
-
-.panel h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--f-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--acento);
-  margin: 0 0 14px;
-}
-
-.panel h3::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--c-pulpa), var(--c-ambar));
-}
-
-.panel__grupo { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-.panel__grupo--uno { grid-template-columns: 1fr; }
-
-.panel hr {
-  border: none;
-  border-top: 1px solid var(--borde);
-  margin: 20px 0;
-}
-
-.problemas { margin-top: 18px; display: grid; gap: 8px; }
-
-.problema {
-  display: flex;
-  gap: 9px;
-  align-items: flex-start;
-  font-size: 0.86rem;
-  padding: 9px 12px;
-  border-radius: var(--radio);
-  line-height: 1.4;
-}
-
-.problema--error {
-  background: color-mix(in srgb, #c0392b 12%, transparent);
-  border-left: 3px solid #c0392b;
-}
-
-.problema--aviso {
-  background: color-mix(in srgb, var(--c-tapa) 15%, transparent);
-  border-left: 3px solid var(--c-tapa);
-}
-
-.problema__icono { flex-shrink: 0; font-weight: 700; }
-
-.hoja-marco { overflow-x: auto; }
-
-.hoja-cabecera {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-  padding: 14px 18px;
-  border-radius: var(--radio);
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-}
-
-.hoja-cabecera__lote { font-family: var(--f-mono); font-size: 1.05rem; }
-.hoja-cabecera__vence { color: var(--texto-suave); margin-left: 12px; font-size: 0.9rem; }
-.hoja-cabecera__pastillas { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* Cabecera de la página del generador */
-.gen-cabeza {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.gen-volver {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--texto-suave);
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--borde);
-  background: var(--superficie);
-  transition: color 0.2s, border-color 0.2s;
-}
-
-.gen-volver:hover { color: var(--texto); border-color: var(--borde-fuerte); }
-
-.gen-intro {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: clamp(18px, 4vw, 40px);
-  align-items: center;
-  margin-bottom: 36px;
-}
-
-.gen-intro h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 0.25em; }
-.gen-intro .plomo { margin: 0; }
-
-@media (max-width: 640px) {
-  .gen-intro { grid-template-columns: 1fr; }
-  .gen-intro .logotipo { justify-self: start; }
 }

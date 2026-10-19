@@ -16,7 +16,11 @@ export function obtenerPool() {
   pool = new Pool({
     connectionString,
     // Railway usa certificados gestionados; en red interna no hace falta TLS.
-    ssl: connectionString.includes('railway.internal') ? false : { rejectUnauthorized: false },
+    // sslmode=disable en la URL lo apaga también (bases locales de prueba).
+    ssl:
+      connectionString.includes('railway.internal') || /sslmode=disable/.test(connectionString)
+        ? false
+        : { rejectUnauthorized: false },
     max: 5,
     idleTimeoutMillis: 30_000,
   });
@@ -69,6 +73,18 @@ export async function migrar() {
       creado_en   TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
+
+  // Etiquetas editables guardadas con nombre (plantilla completa en JSONB).
+  await consultar(`
+    CREATE TABLE IF NOT EXISTS etiquetas (
+      id              SERIAL PRIMARY KEY,
+      nombre          TEXT NOT NULL,
+      datos           JSONB NOT NULL,
+      creado_en       TIMESTAMPTZ NOT NULL DEFAULT now(),
+      actualizado_en  TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+  await consultar(`CREATE UNIQUE INDEX IF NOT EXISTS idx_etiquetas_nombre ON etiquetas (lower(nombre));`);
 
   console.log('[db] migraciones aplicadas');
 }
