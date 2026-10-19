@@ -77,7 +77,7 @@ export function plantillaPorDefecto() {
     },
     fabricante: {
       razonSocial: marcaBase.razonSocial,
-      nit: '',
+      nit: marcaBase.nit,
       direccion: marcaBase.direccion,
       ciudad: `${marcaBase.localidad}, ${marcaBase.ciudad}`,
       telefono: marcaBase.contacto.telefono,
