@@ -17,6 +17,7 @@ export const metadata = {
     type: 'website',
     locale: 'es_CO',
     siteName: marca.nombre,
+    images: [{ url: '/fotos/frasco-estudio.jpg', width: 1136, height: 1408, alt: producto.denominacion }],
   },
   robots: { index: true, follow: true },
 };

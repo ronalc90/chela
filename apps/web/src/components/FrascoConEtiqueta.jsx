@@ -6,18 +6,48 @@ import { svgSello } from '@chela/brand/nutricional';
 import { Emblema } from './Logo';
 
 /**
- * La etiqueta montada sobre la foto real del frasco.
+ * Foto del frasco con la etiqueta de 100 g puesta encima.
  *
  * No es un montaje hecho con un generador de imágenes: la etiqueta se
  * compone en vivo sobre la foto con CSS. Eso tiene dos ventajas sobre un
  * render: el texto queda nítido a cualquier tamaño y, cuando cambian los
  * datos del lote, la etiqueta del frasco cambia con ellos.
  *
- * La curvatura se simula con un degradado de sombras a los costados y un
- * brillo al centro, que es como se comporta la luz sobre un cilindro.
+ * Cada foto trae su propia geometría: dónde queda el cuerpo del frasco
+ * (en % de la foto) y si la cámara lo ve desde arriba, en cuyo caso los
+ * bordes de la etiqueta se curvan hacia abajo en el centro, igual que el
+ * borde de la tapa.
  */
-export default function FrascoConEtiqueta({ foto = '/fotos/frasco-01.jpg' }) {
-  const [mostrar, setMostrar] = useState(true);
+
+export const FOTOS_FRASCO = {
+  estudio: {
+    src: '/fotos/frasco-estudio.jpg',
+    alt: 'Frasco de mermelada de mora con tapa dorada sobre fondo de miel',
+    ancho: 1136,
+    alto: 1408,
+    // Cuerpo de vidrio entre el aro de la tapa y la base.
+    etiqueta: { x: 26, y: 54.5, w: 49, h: 20.5 },
+    curva: true,
+  },
+  casera: {
+    src: '/fotos/frasco-01.jpg',
+    alt: 'Frasco de mermelada de mora con tapa dorada',
+    ancho: 1659,
+    alto: 2212,
+    etiqueta: { x: 28, y: 43.5, w: 47.5, h: 17 },
+    curva: false,
+  },
+};
+
+export default function FrascoConEtiqueta({
+  foto = 'estudio',
+  conEtiqueta = true,
+  control = true,
+  pie = null,
+  className = '',
+}) {
+  const datos = FOTOS_FRASCO[foto] ?? FOTOS_FRASCO.estudio;
+  const [mostrar, setMostrar] = useState(conEtiqueta);
 
   const etiqueta = useMemo(
     () =>
@@ -40,19 +70,32 @@ export default function FrascoConEtiqueta({ foto = '/fotos/frasco-01.jpg' }) {
     [etiqueta],
   );
 
+  const { x, y, w, h } = datos.etiqueta;
+  const estilo = {
+    '--foto-ratio': `${datos.ancho} / ${datos.alto}`,
+    '--etq-x': `${x}%`,
+    '--etq-y': `${y}%`,
+    '--etq-w': `${w}%`,
+    '--etq-h': `${h}%`,
+  };
+
   return (
-    <div className="montaje">
-      <figure className="montaje__figura">
+    <div className={`montaje ${className}`}>
+      <figure className="montaje__figura" style={estilo}>
         <img
-          src={foto}
-          alt="Frasco de mermelada de mora con tapa dorada"
-          width="900"
-          height="1200"
+          src={datos.src}
+          alt={`${datos.alt}${mostrar ? ', con la etiqueta de 100 g' : ', sin etiqueta'}`}
+          width={datos.ancho}
+          height={datos.alto}
           className="montaje__foto"
         />
 
         <div
-          className={`envoltura-etq ${mostrar ? 'envoltura-etq--puesta' : ''}`}
+          className={[
+            'envoltura-etq',
+            mostrar ? 'envoltura-etq--puesta' : '',
+            datos.curva ? 'envoltura-etq--curva' : '',
+          ].join(' ')}
           aria-hidden={!mostrar}
         >
           <div className="envoltura-etq__papel">
@@ -83,21 +126,25 @@ export default function FrascoConEtiqueta({ foto = '/fotos/frasco-01.jpg' }) {
           {/* Sombras laterales y brillo central: el frasco es un cilindro. */}
           <div className="envoltura-etq__curva" aria-hidden="true" />
         </div>
+
+        {pie ? <figcaption className="montaje__pie">{pie}</figcaption> : null}
       </figure>
 
-      <div className="montaje__control no-imprimir">
-        <button
-          type="button"
-          className="boton boton--fantasma"
-          onClick={() => setMostrar((v) => !v)}
-        >
-          {mostrar ? 'Ver el frasco sin etiqueta' : 'Poner la etiqueta'}
-        </button>
-        <p className="montaje__nota">
-          La etiqueta se dibuja en vivo sobre la foto, así que el lote y la fecha que ves son los
-          que se generarían hoy.
-        </p>
-      </div>
+      {control ? (
+        <div className="montaje__control no-imprimir">
+          <button
+            type="button"
+            className="boton boton--fantasma"
+            onClick={() => setMostrar((v) => !v)}
+          >
+            {mostrar ? 'Ver el frasco sin etiqueta' : 'Poner la etiqueta'}
+          </button>
+          <p className="montaje__nota">
+            La etiqueta se dibuja en vivo sobre la foto, así que el lote y la fecha que ves son los
+            que se generarían hoy.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

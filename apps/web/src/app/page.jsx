@@ -7,11 +7,6 @@ import FrascoConEtiqueta from '@/components/FrascoConEtiqueta';
 import { Emblema, Logotipo } from '@/components/Logo';
 import { marca, producto } from '@chela/brand/tokens';
 
-const FOTOS = [
-  { src: '/fotos/frasco-01.jpg', pie: 'El frasco terminado, sellado al vacío con tapa metálica.' },
-  { src: '/fotos/frasco-02.jpg', pie: 'La mora conserva la semilla: textura de mermelada casera, no de jalea.' },
-];
-
 const CHIPS = [
   { texto: 'Mora de Castilla', color: '#a32c63' },
   { texto: `Hecha en ${marca.localidad}`, color: '#e8a33d' },
@@ -146,20 +141,17 @@ export default function Pagina() {
       <section className="seccion seccion--alt" id="galeria">
         <div className="envoltura">
           <div className="seccion__cabeza">
-            <span className="rotulo">Registro del proyecto</span>
-            <h2>El frasco, de cerca</h2>
+            <span className="rotulo">El frasco</span>
+            <h2>Con etiqueta y sin etiqueta</h2>
             <p className="plomo">
-              El producto terminado y su textura: mora con semilla, sellada al vacío en frasco de
-              vidrio con tapa metálica.
+              El frasco de 100 g, sellado al vacío con tapa metálica dorada: primero con la etiqueta
+              puesta, tal como sale de la producción, y después sin ella, para ver la mora con su
+              semilla.
             </p>
           </div>
-          <div className="galeria">
-            {FOTOS.map((f) => (
-              <figure key={f.src}>
-                <img src={f.src} alt={f.pie} loading="lazy" width="600" height="800" />
-                <figcaption>{f.pie}</figcaption>
-              </figure>
-            ))}
+          <div className="galeria galeria--frascos">
+            <FrascoConEtiqueta conEtiqueta control={false} pie="Con la etiqueta de 100 g" />
+            <FrascoConEtiqueta conEtiqueta={false} control={false} pie="Sin etiqueta" />
           </div>
         </div>
       </section>
