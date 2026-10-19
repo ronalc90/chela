@@ -20,7 +20,9 @@ export const marca = {
   nombreCorto: 'SaborPuro',
   descriptor: 'Mermelada artesanal de mora',
   eslogan: 'Del cultivo a la mesa, sin atajos',
-  razonSocial: 'Mujeres Usmeñas',
+  razonSocial: 'Graciela Arrigui',
+  // Quien elabora la mermelada; es lo que sale impreso en «Fabricado por».
+  elaboradaPor: 'Graciela Arrigui',
   nit: 'PENDIENTE — NIT',
   direccion: 'TV 7D 67-80 sur, Monteblanco',
   localidad: 'Usme',

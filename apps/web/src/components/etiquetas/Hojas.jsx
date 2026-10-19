@@ -26,15 +26,15 @@ export const EtiquetaImpresa = forwardRef(function EtiquetaImpresa({ r, barras, 
       style={{ '--escala': imp.escalaTexto / 100 }}
     >
       <div className="etq__cabecera">
-        {/* La canasta va ARRIBA del nombre, también en el rótulo impreso. */}
+        {/* El nombre va ARRIBA de la canasta, también en el rótulo impreso. */}
         <p className={`etq__marca ${r.marca.mostrarCanasta ? '' : 'etq__marca--solo-nombre'}`}>
-          {r.marca.mostrarCanasta && (
-            <Emblema tamano={40} detalle="simple" className="etq__emblema" decorativo />
-          )}
           <span className="etq__nombre marca-wm">
             <span className="marca-wm__sabor">{r.marca.parte1}</span>
             {conNombre2 && <span className="marca-wm__puro">{r.marca.parte2}</span>}
           </span>
+          {r.marca.mostrarCanasta && (
+            <Emblema tamano={40} detalle="simple" className="etq__emblema" decorativo />
+          )}
         </p>
         <div className="etq__textos">
           <p className="etq__denominacion">{r.denominacion}</p>

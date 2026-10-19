@@ -23,12 +23,12 @@ export default function Pagina() {
       <header className="hero" id="inicio">
         <div className="envoltura hero__rejilla">
           <div className="hero__texto">
-            {/* La canasta va ARRIBA del nombre: es el bloque de marca. */}
+            {/* El nombre va ARRIBA de la canasta: es el bloque de marca. */}
             <div className="hero__marca carga-1">
-              <Emblema tamano={220} className="hero__emblema" titulo="Canasta de fruta de SaborPuro" />
               <h1 className="hero__titulo">
                 <span className="hero__sabor">Sabor</span><span className="hero__puro">Puro</span>
               </h1>
+              <Emblema tamano={220} className="hero__emblema" titulo="Canasta de fruta de SaborPuro" />
             </div>
             <p className="hero__sub carga-2">{marca.descriptor}</p>
             <p className="plomo carga-2">

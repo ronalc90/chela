@@ -49,7 +49,7 @@
   gap: 2.4cqw;
 }
 
-/* Bloque de marca: la canasta ARRIBA del nombre. */
+/* Bloque de marca: el nombre ARRIBA de la canasta. */
 .etq__marca {
   display: flex;
   flex-direction: column;
@@ -63,7 +63,7 @@
 .etq__nombre {
   font-size: calc(3.7cqw * var(--escala));
   white-space: nowrap;
-  margin-top: 0.2cqw;
+  margin-bottom: 0.2cqw;
 }
 
 .etq__marca--solo-nombre .etq__nombre { font-size: calc(5cqw * var(--escala)); }

@@ -3,10 +3,11 @@
 /**
  * Logotipo de SaborPuro — ilustración original en SVG.
  *
- * Una canasta de mimbre trenzado, con asa torcida, llena de fruta: manzana
- * roja, manzana verde, naranja, frambuesa, fresa y, al frente, las moras de
- * Castilla, que son el producto de la casa. Se dibujó desde cero en código;
- * no se calcó ni se recortó ninguna imagen de banco.
+ * Una canasta de mimbre trenzado, con asa torcida, rebosando fruta: piña,
+ * plátanos, manzana roja y verde, pera, naranja, uvas, fresas, frambuesa y,
+ * al frente, las moras de Castilla, que son el producto de la casa. Se
+ * dibujó desde cero en código; no se calcó ni se recortó ninguna imagen de
+ * banco, y por eso no arrastra marcas de agua ni licencias ajenas.
  *
  * Tres variantes:
  *  - `completo`: con volumen, brillos y trenzado. Para la web.
@@ -40,12 +41,24 @@ const SEMILLAS_FRESA = [
   [-6, 6], [0, 5], [6, 6], [-3, 11], [3, 11], [0, 15],
 ];
 
+/** Racimo de uvas: granos en triángulo, más gordos que los de la mora. */
+const GRANOS_UVA = [
+  [0, -15], [-8, -9], [8, -9],
+  [-15, -2], [0, -3], [15, -2],
+  [-9, 5], [1, 4], [10, 5],
+  [-4, 12], [5, 12],
+  [0, 19],
+];
+
 const HOJA = 'M0 0 C 9 -10 26 -12 38 -3 C 27 7 10 9 0 0 Z';
+const PERA = 'M0 -27 C 7 -27 9 -19 6 -12 C 16 -6 19 7 12 15 C 6 22 -6 22 -12 15 C -19 7 -16 -6 -6 -12 C -9 -19 -7 -27 0 -27 Z';
+const PLATANO = 'M-23 3 C -21 -13 -6 -22 13 -20 C 18 -19 19 -14 14 -13 C 1 -14 -10 -7 -13 5 C -15 11 -22 10 -23 3 Z';
+const PENACHO = 'M0 0 C 4 -16 3 -31 -1 -44 C 6 -34 10 -18 8 -2 Z';
 const MANZANA = 'M0 -17 C 7 -24 25 -22 26 -3 C 27 15 14 27 0 23 C -14 27 -27 15 -26 -3 C -25 -22 -7 -24 0 -17 Z';
 const FRESA = 'M0 -13 C 11 -14 16 -5 14 3 C 12 11 5 18 0 20 C -5 18 -12 11 -14 3 C -16 -5 -11 -14 0 -13 Z';
 const CALIZ = 'M0 -12 L -9 -15 L -4 -11 L -11 -8 L -3 -9 L 0 -5 L 3 -9 L 11 -8 L 4 -11 L 9 -15 Z';
 const CUERPO = 'M40 132 L200 132 C 197 160 188 186 172 197 Q 120 210 68 197 C 52 186 43 160 40 132 Z';
-const ASA = 'M46 124 C 46 26, 194 26, 194 124';
+const ASA = 'M46 124 C 46 16, 194 16, 194 124';
 
 function Hoja({ x, y, rot = 0, esc = 1, p }) {
   return (
@@ -67,6 +80,62 @@ function Mora({ x, y, esc = 1, p, tipo = 'mora' }) {
         <g key={`${dx}:${dy}`}>
           <circle cx={dx} cy={dy} r="3.4" fill={relleno} />
           {!p.mono && <circle cx={dx - 1.1} cy={dy - 1.2} r="1" fill={p.brillo} />}
+        </g>
+      ))}
+    </g>
+  );
+}
+
+function Uvas({ x, y, esc = 1, p }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${esc})`}>
+      <path d="M0 -15 C 0 -21 2 -25 5 -28" stroke={p.tallo} strokeWidth="2.2" strokeLinecap="round" fill="none" />
+      <Hoja x={3} y={-26} rot={-34} esc={0.45} p={p} />
+      {GRANOS_UVA.map(([dx, dy]) => (
+        <g key={`${dx}:${dy}`}>
+          <circle cx={dx} cy={dy} r="6.4" fill={p.uva} />
+          {!p.mono && <circle cx={dx - 2} cy={dy - 2.2} r="1.8" fill={p.brillo} />}
+        </g>
+      ))}
+    </g>
+  );
+}
+
+function Pera({ x, y, esc = 1, rot = 0, p }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${esc})`}>
+      <path d={PERA} fill={p.pera} />
+      <path d="M0 -26 C 1 -32 3 -36 6 -38" stroke={p.tallo} strokeWidth="2.4" strokeLinecap="round" fill="none" />
+      <Hoja x={5} y={-35} rot={-30} esc={0.44} p={p} />
+      {!p.mono && <ellipse cx="-8" cy="4" rx="4.5" ry="8" transform="rotate(-18 -8 4)" fill={p.brillo} />}
+    </g>
+  );
+}
+
+/** Tres plátanos en racimo, apenas asomando por detrás de la fruta. */
+function Platanos({ x, y, esc = 1, rot = 0, p }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${esc})`}>
+      {[[0, 0, 0], [3, 7, 6], [-3, 13, 11]].map(([dx, dy, giro]) => (
+        <g key={`${dx}:${dy}`} transform={`translate(${dx} ${dy}) rotate(${giro})`}>
+          <path d={PLATANO} fill={p.platano} />
+          {!p.mono && (
+            <path d="M-18 0 C -14 -10 -3 -16 10 -16" stroke={p.brillo} strokeWidth="2.6" fill="none" strokeLinecap="round" />
+          )}
+        </g>
+      ))}
+      <circle cx="14" cy="-17" r="3" fill={p.tallo} />
+    </g>
+  );
+}
+
+/** Penacho de piña: el abanico verde que corona la canasta por detrás. */
+function Penacho({ x, y, esc = 1, p }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${esc})`}>
+      {[-46, -30, -15, 0, 15, 30, 46].map((giro, i) => (
+        <g key={giro} transform={`rotate(${giro}) scale(${i % 2 ? 0.84 : 1})`}>
+          <path d={PENACHO} fill={p.penacho} />
         </g>
       ))}
     </g>
@@ -172,6 +241,7 @@ function paleta(u, mono) {
       borde: c, cuerpo: c, trenza: 'transparent', trenzaBorde: 'transparent',
       hoja: c, hojaVena: c, hojaOscura: c, tallo: c,
       manzanaRoja: c, manzanaVerde: c, naranja: c, fresa: c, mora: c, frambuesa: c,
+      uva: c, pera: c, platano: c, penacho: c,
       brillo: 'transparent', semilla: 'transparent', poro: 'transparent', sombra: 'transparent',
     };
   }
@@ -183,6 +253,7 @@ function paleta(u, mono) {
     hoja: r('hoja'), hojaVena: 'rgba(30, 72, 34, 0.55)', hojaOscura: '#3d7a3a', tallo: '#6b3e1e',
     manzanaRoja: r('manzana'), manzanaVerde: r('verde'), naranja: r('naranja'),
     fresa: r('fresa'), mora: r('mora'), frambuesa: r('frambuesa'),
+    uva: r('uva'), pera: r('pera'), platano: r('platano'), penacho: r('penacho'),
     brillo: 'rgba(255, 255, 255, 0.42)', semilla: '#f8dd8c', poro: 'rgba(120, 60, 0, 0.35)',
     sombra: 'rgba(58, 14, 36, 0.2)',
   };
@@ -218,6 +289,10 @@ function Degradados({ u }) {
       {radial('fresa', [['0', '#ff8f86'], ['0.5', '#e3283f'], ['1', '#97102c']])}
       {radial('mora', [['0', '#a2649a'], ['0.45', '#4f1239'], ['1', '#22051a']])}
       {radial('frambuesa', [['0', '#ffb0c6'], ['0.5', '#d6457e'], ['1', '#8a1c4a']])}
+      {radial('uva', [['0', '#9f7fc4'], ['0.45', '#53308c'], ['1', '#2a1050']])}
+      {radial('pera', [['0', '#f4f7a8'], ['0.5', '#c3d858'], ['1', '#7d9a2c']])}
+      {lineal('platano', [['0', '#ffe9a0'], ['0.5', '#f6cc4a'], ['1', '#d79a12']], '0.3', '1')}
+      {lineal('penacho', [['0', '#7fc96a'], ['1', '#2f6b32']], '0.4', '1')}
       <clipPath id={`${u}-cuerpo`}>
         <path d={CUERPO} />
       </clipPath>
@@ -260,7 +335,12 @@ export function Emblema({
       {/* Sombra en la mesa */}
       {!simple && <ellipse cx="120" cy="208" rx="90" ry="7" fill={p.sombra} />}
 
-      {/* Asa torcida */}
+      {/* Penacho de la piña y hojas: lo único que asoma por detrás del asa */}
+      {!simple && <Penacho x={118} y={58} esc={0.95} p={p} />}
+      {!mono && <Hoja x={62} y={84} rot={-152} esc={simple ? 1.15 : 1.08} p={p} />}
+      {!mono && <Hoja x={178} y={84} rot={-28} esc={simple ? 1.15 : 1.08} p={p} />}
+
+      {/* Asa torcida: cruza por delante del penacho y por detrás de la fruta */}
       <path d={ASA} stroke={p.asa} strokeWidth={simple ? 13 : 12} strokeLinecap="round" />
       {!simple && (
         <>
@@ -269,24 +349,25 @@ export function Emblema({
         </>
       )}
 
-      {/* Hojas del fondo */}
-      {!mono && <Hoja x={66} y={84} rot={-150} esc={simple ? 1.15 : 1.05} p={p} />}
-      {!mono && <Hoja x={176} y={84} rot={-30} esc={simple ? 1.15 : 1.05} p={p} />}
-      {!simple && <Hoja x={126} y={56} rot={-98} esc={0.82} p={p} />}
+      {/* Fruta de atrás: manzana verde y pera asomando */}
+      {!simple && <Manzana x={146} y={78} esc={0.8} p={p} verde />}
+      {!simple && <Pera x={190} y={86} esc={0.72} rot={10} p={p} />}
 
-      {/* Fruta de atrás */}
-      {!simple && <Manzana x={123} y={72} esc={0.86} p={p} verde />}
-      <Manzana x={80} y={86} esc={simple ? 1.18 : 1.1} p={p} />
-      <Naranja x={163} y={88} r={simple ? 29 : 27} p={p} />
+      {/* Fruta media. Los plátanos van por DELANTE de la manzana roja: si
+          quedan detrás solo asoman las puntas y no se leen. */}
+      <Manzana x={simple ? 74 : 68} y={simple ? 90 : 96} esc={simple ? 1.18 : 1} p={p} />
+      {!simple && <Platanos x={104} y={84} esc={0.92} rot={-12} p={p} />}
+      <Naranja x={simple ? 166 : 172} y={simple ? 92 : 96} r={simple ? 29 : 24} p={p} />
+      {!simple && <Uvas x={138} y={98} esc={0.82} p={p} />}
 
-      {/* Fruta del frente */}
-      {!simple && <Fresa x={52} y={108} esc={1.12} rot={-24} p={p} />}
-      {!simple && <Mora x={184} y={108} esc={1.05} p={p} tipo="frambuesa" />}
-      {!simple && <Mora x={120} y={90} esc={1.05} p={p} />}
-      <Mora x={simple ? 108 : 102} y={simple ? 106 : 106} esc={simple ? 1.45 : 1.28} p={p} />
-      <Mora x={simple ? 138 : 138} y={simple ? 108 : 105} esc={simple ? 1.4 : 1.32} p={p} />
-      {!simple && <Hoja x={152} y={118} rot={14} esc={0.6} p={p} />}
-      {!simple && <Hoja x={86} y={121} rot={166} esc={0.6} p={p} />}
+      {/* Fruta del frente: las moras mandan, que son el producto */}
+      {!simple && <Fresa x={44} y={116} esc={1} rot={-26} p={p} />}
+      {!simple && <Mora x={196} y={116} esc={0.95} p={p} tipo="frambuesa" />}
+      <Mora x={simple ? 108 : 92} y={simple ? 106 : 114} esc={simple ? 1.45 : 1.36} p={p} />
+      <Mora x={simple ? 138 : 144} y={simple ? 108 : 118} esc={simple ? 1.4 : 1.42} p={p} />
+      {!simple && <Fresa x={170} y={122} esc={0.76} rot={20} p={p} />}
+      {!simple && <Hoja x={158} y={126} rot={12} esc={0.55} p={p} />}
+      {!simple && <Hoja x={76} y={128} rot={168} esc={0.55} p={p} />}
 
       {/* Cuerpo de la canasta */}
       <path d={CUERPO} fill={p.cuerpo} opacity={mono ? 0.85 : 1} />
@@ -335,15 +416,15 @@ export function Marca({ className = '' }) {
 }
 
 /**
- * Bloque de marca: la canasta ARRIBA y el nombre debajo, centrados.
+ * Bloque de marca: el nombre ARRIBA y la canasta debajo, centrados.
  * `tamano` es el ancho de la canasta en px; el nombre escala con él
  * a través de la variable --logo-tamano.
  */
 export function Logotipo({ tamano = 72, detalle = 'completo', className = '', decorativo = false }) {
   return (
     <span className={`logotipo ${className}`} style={{ '--logo-tamano': `${tamano}px` }}>
-      <Emblema tamano={tamano} detalle={detalle} className="logotipo__emblema" decorativo />
       <Marca className="logotipo__nombre" />
+      <Emblema tamano={tamano} detalle={detalle} className="logotipo__emblema" decorativo />
     </span>
   );
 }
