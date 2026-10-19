@@ -6,7 +6,7 @@ import { construirEtiqueta, validarEtiqueta } from '@chela/brand/etiqueta';
 import { svgEan13, esEanValido } from '@chela/brand/barcode';
 import { svgSello } from '@chela/brand/nutricional';
 import { marca, producto } from '@chela/brand/tokens';
-import { Emblema } from '@/components/Logo';
+import { Emblema, Logotipo } from '@/components/Logo';
 
 const HOY = new Date().toISOString().slice(0, 10);
 
@@ -14,8 +14,22 @@ const HOY = new Date().toISOString().slice(0, 10);
 const FORMATOS = {
   '70x50': { ancho: 70, alto: 50, nombre: '70 × 50 mm — frasco de 100 g' },
   '90x60': { ancho: 90, alto: 60, nombre: '90 × 60 mm — frasco de 250 g' },
-  '60x40': { ancho: 60, alto: 40, nombre: '60 × 40 mm — queda justo, revisa el aviso' },
+  '60x40': { ancho: 60, alto: 40, nombre: '60 × 40 mm — formato mínimo, letra pequeña' },
 };
+
+/**
+ * Cuántas etiquetas caben en una hoja A4 (210 × 297 mm) con el margen de
+ * @page (8 mm por lado) y la separación de la rejilla (4 mm). Debe coincidir
+ * con impresion.css; si allá cambian, cambia aquí.
+ */
+const A4_UTIL = { ancho: 210 - 16, alto: 297 - 16 };
+const SEPARACION = 4;
+
+function capacidadA4({ ancho, alto }) {
+  const columnas = Math.floor((A4_UTIL.ancho + SEPARACION) / (ancho + SEPARACION));
+  const filas = Math.floor((A4_UTIL.alto + SEPARACION) / (alto + SEPARACION));
+  return { columnas, filas, porHoja: columnas * filas };
+}
 
 export default function GeneradorEtiquetas() {
   const [fecha, setFecha] = useState(HOY);
@@ -26,7 +40,7 @@ export default function GeneradorEtiquetas() {
   const [rendimiento, setRendimiento] = useState(1200);
   const [vidaUtil, setVidaUtil] = useState(18);
   const [neto, setNeto] = useState(producto.contenidoNetoGramos);
-  const [cantidad, setCantidad] = useState(12);
+  const [cantidad, setCantidad] = useState(capacidadA4(FORMATOS['70x50']).porHoja);
   const [formato, setFormato] = useState('70x50');
   const [ean, setEan] = useState('');
   const [recorte, setRecorte] = useState(0);
@@ -52,6 +66,16 @@ export default function GeneradorEtiquetas() {
   }, [fecha, tanda, mora, azucar, limon, rendimiento, vidaUtil, neto, ean]);
 
   const dim = FORMATOS[formato];
+  const capacidad = capacidadA4(dim);
+
+  // Si la cantidad era "una hoja llena" del formato anterior, se ajusta a
+  // una hoja llena del nuevo; si la persona puso otro número, se respeta.
+  function cambiarFormato(nuevo) {
+    if (Number(cantidad) === capacidadA4(FORMATOS[formato]).porHoja) {
+      setCantidad(capacidadA4(FORMATOS[nuevo]).porHoja);
+    }
+    setFormato(nuevo);
+  }
 
   // El rótulo lleva datos que la norma exige. Si no caben en el formato
   // elegido, hay que decirlo antes de imprimir, no recortarlos en silencio.
@@ -70,6 +94,7 @@ export default function GeneradorEtiquetas() {
     };
   }, [medir, formato, fecha, tanda, mora, azucar, limon, rendimiento, vidaUtil, neto, ean]);
   const n = Math.min(Math.max(Number(cantidad) || 1, 1), 60);
+  const hojas = Math.ceil(n / capacidad.porHoja);
 
   const barras = useMemo(() => {
     if (resultado.error) return '';
@@ -91,21 +116,26 @@ export default function GeneradorEtiquetas() {
   return (
     <main style={{ paddingBlock: '32px 80px' }}>
       <div className="envoltura no-imprimir">
-        <Link
-          href="/"
-          style={{ fontSize: '0.9rem', textDecoration: 'none', color: 'var(--texto-suave)' }}
-        >
-          ← Volver al sitio
-        </Link>
-        <span className="rotulo" style={{ marginTop: 20, display: 'flex' }}>
-          Para imprimir y pegar
-        </span>
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.1rem)' }}>Generador de etiquetas</h1>
-        <p className="plomo" style={{ marginBottom: 36 }}>
-          Llena los datos de la tanda y se arma la hoja lista para imprimir en papel adhesivo A4.
-          El lote, el vencimiento, la tabla y el código de barras se calculan solos a partir de la
-          receta.
-        </p>
+        <div className="gen-cabeza">
+          <Link href="/" className="gen-volver">
+            <span aria-hidden="true">←</span> Volver al sitio
+          </Link>
+        </div>
+
+        <div className="gen-intro">
+          <Link href="/" aria-label="SaborPuro, inicio" style={{ textDecoration: 'none' }}>
+            <Logotipo tamano={112} />
+          </Link>
+          <div>
+            <span className="rotulo">Para imprimir y pegar</span>
+            <h1>Generador de etiquetas</h1>
+            <p className="plomo">
+              Llena los datos de la tanda y se arma la hoja lista para imprimir en papel adhesivo
+              A4. El lote, el vencimiento, la tabla y el código de barras se calculan solos a partir
+              de la receta.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="envoltura">
@@ -170,7 +200,7 @@ export default function GeneradorEtiquetas() {
             <div className="panel__grupo--uno panel__grupo">
               <div className="campo">
                 <label htmlFor="g-formato">Tamaño de etiqueta</label>
-                <select id="g-formato" value={formato} onChange={(e) => setFormato(e.target.value)}>
+                <select id="g-formato" value={formato} onChange={(e) => cambiarFormato(e.target.value)}>
                   {Object.entries(FORMATOS).map(([k, v]) => (
                     <option key={k} value={k}>{v.nombre}</option>
                   ))}
@@ -201,6 +231,7 @@ export default function GeneradorEtiquetas() {
               onClick={() => window.print()}
             >
               Imprimir {n} {n === 1 ? 'etiqueta' : 'etiquetas'}
+              {hojas > 1 ? ` · ${hojas} hojas` : ''}
             </button>
 
             {recorte > 1 && (
@@ -235,16 +266,22 @@ export default function GeneradorEtiquetas() {
               <>
                 <div className="hoja-cabecera no-imprimir">
                   <div>
-                    <strong style={{ fontFamily: 'var(--f-mono)' }}>
+                    <strong className="hoja-cabecera__lote">
                       Lote {resultado.etiqueta.reverso.lote}
                     </strong>
-                    <span style={{ color: 'var(--texto-suave)', marginLeft: 12, fontSize: '0.9rem' }}>
+                    <span className="hoja-cabecera__vence">
                       vence {resultado.etiqueta.reverso.fechaVencimiento}
                     </span>
                   </div>
-                  <span className="pastilla">
-                    {dim.ancho} × {dim.alto} mm · {n} en hoja A4
-                  </span>
+                  <div className="hoja-cabecera__pastillas">
+                    <span className="pastilla">{dim.ancho} × {dim.alto} mm</span>
+                    <span className="pastilla">
+                      {capacidad.porHoja} por hoja A4 ({capacidad.columnas} × {capacidad.filas})
+                    </span>
+                    <span className={`pastilla ${hojas > 1 ? 'pastilla--alerta' : ''}`}>
+                      {n} {n === 1 ? 'etiqueta' : 'etiquetas'} · {hojas} {hojas === 1 ? 'hoja' : 'hojas'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="hoja-marco">
@@ -276,14 +313,17 @@ const Etiqueta = forwardRef(function Etiqueta({ etiqueta, barras, sello }, ref) 
   return (
     <div className="etq" ref={ref}>
       <div className="etq__cabecera">
-        <div>
-          <p className="etq__marca">
-            <Emblema tamano={26} className="etq__emblema" />
-            <span><span className="etq__sabor">Sabor</span><span className="etq__puro">Puro</span></span>
-          </p>
+        {/* La canasta va ARRIBA del nombre, también en el rótulo impreso. */}
+        <p className="etq__marca">
+          <Emblema tamano={40} detalle="simple" className="etq__emblema" decorativo />
+          <span className="etq__nombre marca-wm">
+            <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
+          </span>
+        </p>
+        <div className="etq__textos">
           <p className="etq__denominacion">{etiqueta.frente.denominacion}</p>
           <p className="etq__calificativo">{etiqueta.frente.calificativo}</p>
-          <p className="etq__peso" style={{ marginTop: '1.2mm' }}>
+          <p className="etq__peso" style={{ marginTop: '1mm' }}>
             Peso neto: {etiqueta.frente.contenidoNeto}
           </p>
         </div>

@@ -16,8 +16,9 @@
   justify-content: center;
   background: #ffffff;
   padding: 8mm;
-  border-radius: var(--radio);
-  border: 1.5px solid var(--borde);
+  border-radius: var(--radio-g);
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra-f);
 }
 
 /* ------------------------------------------------------- la etiqueta física */
@@ -55,30 +56,40 @@
 }
 
 .etq__cabecera {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 2mm;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 2.4cqw;
 }
 
+/* Bloque de marca: la canasta ARRIBA del nombre. */
 .etq__marca {
-  font-family: var(--f-titulo);
-  font-size: 5.7cqw;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
-  color: #2f6b42;
+  line-height: 1;
 }
 
-.etq__hoja { color: #5fa573; margin-right: 0.8mm; }
+.etq__emblema { width: 13.5cqw; height: auto; display: block; }
+
+.etq__nombre {
+  font-size: 3.7cqw;
+  white-space: nowrap;
+  margin-top: 0.2cqw;
+}
+
+.etq__nombre .marca-wm__sabor { color: #3a0e24; }
+.etq__nombre .marca-wm__puro { color: #b57618; }
+
+.etq__textos { min-width: 0; }
 
 .etq__denominacion {
   font-family: var(--f-titulo);
-  font-size: 4cqw;
-  font-weight: 600;
-  margin: 0.5mm 0 0;
-  line-height: 1.15;
+  font-size: 4.2cqw;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.12;
 }
 
 .etq__calificativo {
@@ -165,6 +176,7 @@
     padding: 0;
     border: none;
     border-radius: 0;
+    box-shadow: none;
     gap: var(--etq-gap);
     justify-content: flex-start;
   }
@@ -184,7 +196,7 @@
     print-color-adjust: exact;
   }
 
-  .etq__marca, .etq__hoja {
+  .etq__marca, .etq__marca svg {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -213,11 +225,11 @@
 
 .panel {
   position: sticky;
-  top: 86px;
-  background: var(--fondo);
-  border: 1.5px solid var(--borde);
+  top: calc(var(--alto-nav, 70px) + 16px);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
   border-radius: var(--radio-g);
-  padding: 22px;
+  padding: 24px;
   box-shadow: var(--sombra);
 }
 
@@ -226,12 +238,23 @@
 }
 
 .panel h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--f-mono);
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--c-moraBrillante);
+  color: var(--acento);
   margin: 0 0 14px;
+}
+
+.panel h3::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-pulpa), var(--c-ambar));
 }
 
 .panel__grupo { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
@@ -276,4 +299,54 @@
   gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radio);
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+}
+
+.hoja-cabecera__lote { font-family: var(--f-mono); font-size: 1.05rem; }
+.hoja-cabecera__vence { color: var(--texto-suave); margin-left: 12px; font-size: 0.9rem; }
+.hoja-cabecera__pastillas { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Cabecera de la página del generador */
+.gen-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.gen-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--texto-suave);
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.gen-volver:hover { color: var(--texto); border-color: var(--borde-fuerte); }
+
+.gen-intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(18px, 4vw, 40px);
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.gen-intro h1 { font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 0.25em; }
+.gen-intro .plomo { margin: 0; }
+
+@media (max-width: 640px) {
+  .gen-intro { grid-template-columns: 1fr; }
+  .gen-intro .logotipo { justify-self: start; }
 }

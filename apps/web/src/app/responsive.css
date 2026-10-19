@@ -3,6 +3,8 @@
    Se carga al final para poder corregir lo que definieron las otras hojas.
    ========================================================================== */
 
+:root { --alto-nav: 70px; }
+
 /* ------------------------------------------------------- barra de navegación */
 
 .nav__acciones {
@@ -19,11 +21,12 @@
   gap: 5px;
   width: 44px;
   height: 44px;
-  padding: 0 10px;
+  padding: 0 11px;
   border: 1.5px solid var(--borde);
   border-radius: 999px;
-  background: transparent;
+  background: var(--superficie);
   cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
 }
 
 .hamburguesa__linea {
@@ -32,47 +35,129 @@
   height: 2px;
   background: var(--texto);
   border-radius: 2px;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s;
+  transition: transform 0.35s var(--ease), opacity 0.2s;
 }
 
 .hamburguesa__linea--x1 { transform: translateY(7px) rotate(45deg); }
 .hamburguesa__linea--x2 { transform: translateY(-7px) rotate(-45deg); }
 .hamburguesa__linea--oculta { opacity: 0; }
 
-.menu-movil {
-  display: none;
-  flex-direction: column;
-  padding: 10px var(--gutter) 26px;
-  border-top: 1px solid var(--borde);
-  background: var(--fondo);
+.nav--abierto .hamburguesa {
+  background: var(--boton-fondo);
+  border-color: transparent;
 }
 
-.menu-movil a {
-  display: block;
-  padding: 15px 4px;
-  font-family: var(--f-titulo);
-  font-size: 1.25rem;
+.nav--abierto .hamburguesa__linea { background: var(--boton-texto); }
+
+/* El menú cubre TODA la pantalla. La barra (logo, tema y cerrar) queda
+   encima porque .nav__interior tiene z-index mayor dentro de .nav. */
+.menu-movil {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: var(--alto-nav);
+  background:
+    radial-gradient(520px 420px at 110% -10%, var(--halo-2), transparent 70%),
+    radial-gradient(560px 460px at -20% 110%, var(--halo-1), transparent 70%),
+    var(--fondo);
+}
+
+.menu-movil__interior {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+  padding-block: 18px 28px;
+}
+
+.menu-movil__lista { list-style: none; margin: 0; padding: 0; }
+
+.menu-movil__lista a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 2px;
   color: var(--texto);
   text-decoration: none;
   border-bottom: 1px solid var(--borde);
 }
 
-.menu-movil a:last-child { border-bottom: none; }
+.menu-movil__num {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--acento);
+  min-width: 2ch;
+}
+
+.menu-movil__texto {
+  flex: 1;
+  font-family: var(--f-titulo);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 8vw, 2.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.menu-movil__flecha {
+  font-size: 1.3rem;
+  color: var(--texto-suave);
+  transition: translate 0.3s var(--ease), color 0.3s;
+}
+
+.menu-movil__lista a:active .menu-movil__flecha,
+.menu-movil__lista a:hover .menu-movil__flecha { translate: 6px 0; color: var(--acento); }
+
+.menu-movil__lista li:last-child a .menu-movil__texto {
+  background: var(--titulo-degradado);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.menu-movil__pie {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--superficie) 70%, transparent);
+  border: 1px solid var(--borde);
+}
+
+.menu-movil__emblema { flex-shrink: 0; }
+.menu-movil__lema { margin: 0 0 6px; font-family: var(--f-titulo); font-style: italic; font-size: 1.1rem; line-height: 1.2; color: var(--acento); }
+.menu-movil__dato { line-height: 1.45; }
+.menu-movil__dato { margin: 0; font-size: 0.86rem; color: var(--texto-suave); }
 
 @media not (prefers-reduced-motion: reduce) {
-  .menu-movil--abierto a {
-    animation: subir 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: calc(var(--n, 0) * 55ms);
+  .menu-movil--abierto { animation: menu-entra 0.35s var(--ease) both; }
+  .menu-movil--abierto li,
+  .menu-movil--abierto .menu-movil__pie {
+    animation: subir 0.5s var(--ease) both;
+    animation-delay: calc(80ms + var(--n, 0) * 55ms);
   }
+}
+
+@keyframes menu-entra {
+  from { opacity: 0; clip-path: circle(0% at calc(100% - 40px) 34px); }
+  to { opacity: 1; clip-path: circle(150% at calc(100% - 40px) 34px); }
+}
+
+@media (max-width: 960px) {
+  .nav__enlaces a { padding: 7px 10px; font-size: 0.86rem; }
 }
 
 @media (max-width: 860px) {
   .nav__enlaces { display: none; }
   .hamburguesa { display: flex; }
-  .menu-movil--abierto { display: flex; }
-
-  .nav__interior { padding-block: 10px; }
-  .nav__marca { font-size: 1.08rem; }
+  .menu-movil--abierto { display: block; }
+  .nav--abierto::before { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav--abierto { border-bottom-color: transparent; }
 }
 
 @media (min-width: 861px) {
@@ -84,33 +169,49 @@
 @media (max-width: 900px) {
   .hero {
     min-height: auto;
-    padding-block: 48px 56px;
+    padding-block: 36px 64px;
   }
 
-  .hero__rejilla { gap: 36px; }
+  .hero__rejilla { grid-template-columns: 1fr; gap: 40px; }
 
-  /* En móvil la foto va primero: es lo que vende el producto. */
-  .hero__rejilla > :last-child { order: -1; }
+  /* En móvil el bloque de marca va primero y centrado; la foto después. */
+  .hero__texto { text-align: center; }
+  .hero__texto .plomo { margin-inline: auto; }
+  .hero__chips, .hero__texto .botonera { justify-content: center; }
 
-  .montaje__figura { max-width: 420px; margin-inline: auto; }
+  .montaje { max-width: 440px; margin-inline: auto; }
 }
 
 @media (max-width: 560px) {
-  .hero__titulo { font-size: clamp(2.8rem, 15vw, 4rem); }
-  .hero__sub { font-size: 1.15rem; }
+  .hero__titulo { font-size: clamp(2.5rem, 14vw, 4rem); }
+  .hero__emblema { width: clamp(128px, 42vw, 180px); }
+  .hero__sub { font-size: 1.2rem; }
   .botonera { gap: 10px; }
-  .botonera .boton { flex: 1 1 100%; justify-content: center; }
+  .botonera .boton { flex: 1 1 100%; }
+  .chip { font-size: 0.8rem; padding: 5px 10px; }
 }
 
 /* ------------------------------------------------------------ secciones */
 
 @media (max-width: 560px) {
-  .seccion { padding-block: 52px; }
+  .seccion { padding-block: 56px; }
   body { font-size: 16px; }
 
-  .paso { padding-left: 54px; padding-block: 14px; }
-  .paso__numero { width: 38px; height: 38px; font-size: 0.82rem; top: 16px; }
-  .pasos::before { left: 19px; }
+  .paso { padding: 18px 18px 18px 74px; }
+  .paso__numero { width: 42px; height: 42px; left: 16px; top: 18px; border-radius: 13px; font-size: 0.86rem; }
+}
+
+/* La etiqueta solo se inclina donde sobra espacio. */
+@media (max-width: 900px) {
+  .etiqueta { rotate: 0deg; }
+}
+
+/* ------------------------------------------------------------- llamado */
+
+@media (max-width: 720px) {
+  .cta { grid-template-columns: 1fr; text-align: left; }
+  .cta__arte { order: -1; width: 128px; }
+  .cta .boton { flex: 1 1 100%; }
 }
 
 /* ----------------------------------------------------- tablas y etiqueta */
@@ -128,8 +229,8 @@
 
 @media (max-width: 420px) {
   /* El sello se encoge para no tapar la marca en pantallas angostas. */
-  .etiqueta__sello { width: 58px; }
-  .etiqueta__sellos { top: 8px; right: 8px; }
+  .etiqueta__sello { width: 58px; height: 58px; }
+  .etiqueta__sellos { top: 10px; right: 10px; }
   .etiqueta__cara { padding: 16px; }
   .etiqueta__barras { width: 124px; }
   .etiqueta__pie { gap: 10px; }
@@ -170,7 +271,7 @@
 
 @media (max-width: 900px) {
   .herramienta { gap: 24px; }
-  .panel { padding: 18px; }
+  .panel { padding: 20px; }
 }
 
 @media (max-width: 420px) {
@@ -182,26 +283,28 @@
 @media (hover: none) {
   .boton { padding: 15px 24px; }
 
+  /* 16px evita que iOS haga zoom al enfocar un campo. */
   .campo input, .campo select { padding: 13px 14px; font-size: 16px; }
 
-  /* 16px evita que iOS haga zoom al enfocar un campo. */
   .etiqueta__campo { padding: 5px 6px; }
-
-  /* Sin hover, el reflejo y la inclinación no aplican. */
-  .inclinable::after { display: none; }
 }
 
 /* ------------------------------------------------------------ galería */
 
 @media (max-width: 560px) {
-  .galeria { grid-template-columns: 1fr; }
-  .galeria img { height: 260px; }
+  .galeria img { height: 300px; }
 }
 
 /* ---------------------------------------------------------------- pie */
 
+@media (max-width: 760px) {
+  .pie__arriba { grid-template-columns: 1fr; }
+  .pie__marca { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .pie__lema { margin-inline: auto; }
+}
+
 @media (max-width: 560px) {
-  .pie { padding-block: 36px 28px; }
+  .pie { padding-block: 48px 28px; }
   .pie__rejilla { gap: 22px; grid-template-columns: 1fr 1fr; }
 }
 
@@ -211,46 +314,14 @@
 
 /* ------------------------------------------- nada se sale de la pantalla */
 
-img, svg, video, canvas {
-  max-width: 100%;
-}
+img, svg, video, canvas { max-width: 100%; }
 
 .envoltura { overflow-wrap: break-word; }
 
-/* El montaje del frasco mantiene proporción en cualquier ancho. */
-@media (max-width: 420px) {
-  .envoltura-etq__lote { font-size: 5.2cqw; }
-}
+h1, h2, h3, .plomo, .paso__texto, .montaje__nota { overflow-wrap: break-word; }
 
-/* ------------------------------------------------ corrección de desborde
-   "SaborPuro" es una sola palabra larga: a tamaños grandes no cabe en
-   una pantalla de teléfono y empujaba el layout 54px hacia la derecha. */
-
-.hero__titulo {
-  overflow-wrap: break-word;
-}
-
-@media (max-width: 760px) {
-  .hero__titulo { font-size: clamp(2rem, 10vw, 3.4rem); }
-}
-
-@media (max-width: 420px) {
-  .hero__titulo { font-size: clamp(1.75rem, 9.2vw, 2.6rem); }
-}
-
-/* Red de seguridad: ningún hijo puede ensanchar la página. */
+/* Red de seguridad: ningún hijo puede ensanchar la página. Varias
+   animaciones de entrada arrancan desplazadas; `clip` corta el eje
+   horizontal sin romper position: sticky, cosa que `hidden` sí haría. */
 html, body { max-width: 100%; }
-
-h1, h2, h3, .plomo, .paso__texto, .montaje__nota {
-  overflow-wrap: break-word;
-}
-
-/* ----------------------------------------------------- red de seguridad
-   Varias animaciones de entrada arrancan desplazadas o escaladas y, con
-   fill `both`, mantienen ese fotograma mientras el elemento espera fuera
-   de pantalla. En vertical no molesta; en horizontal crearía una barra de
-   desplazamiento. `clip` corta ese eje sin romper position: sticky, cosa
-   que `hidden` sí haría. */
-body {
-  overflow-x: clip;
-}
+body { overflow-x: clip; }

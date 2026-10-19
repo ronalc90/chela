@@ -284,17 +284,13 @@
 
 /* ------------------------------------------------------- botones magnéticos */
 
-.boton {
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
-}
-
 .boton::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent 32%, rgba(255, 255, 255, 0.4) 50%, transparent 68%);
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(120deg, transparent 32%, rgba(255, 255, 255, 0.38) 50%, transparent 68%);
   translate: -120% 0;
 }
 
@@ -334,28 +330,10 @@
   }
 
   .paso:hover .paso__numero {
-    transform: scale(1.14) rotate(-8deg);
-    background: var(--c-moraBrillante);
-    color: var(--c-crema);
+    transform: scale(1.1) rotate(-8deg);
   }
 }
 
-/* La línea del proceso se dibuja a medida que bajas. */
-@supports (animation-timeline: view()) {
-  @media not (prefers-reduced-motion: reduce) {
-    .pasos::before {
-      transform-origin: 50% 0;
-      animation: crecer-y linear both;
-      animation-timeline: view(block);
-      animation-range: entry 0% exit 100%;
-    }
-  }
-}
-
-@keyframes crecer-y {
-  from { scale: 1 0; }
-  to   { scale: 1 1; }
-}
 
 /* ----------------------------------------- campos de la etiqueta con pulso */
 
@@ -553,51 +531,61 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 3%;
+  gap: 3cqw;
 }
-
-.envoltura-etq__texto { min-width: 0; }
 
 .envoltura-etq__marca {
-  font-family: var(--f-titulo);
-  font-weight: 800;
-  font-size: 8.6cqw;
-  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
   margin: 0;
-  color: #2f6b42;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
+  line-height: 1;
 }
 
-.envoltura-etq__hoja { color: #5fa573; margin-right: 0.2em; }
+.envoltura-etq__emblema { width: 16cqw; height: auto; }
+
+.envoltura-etq__nombre {
+  font-size: 5.2cqw;
+  white-space: nowrap;
+  margin-top: 0.3cqw;
+}
+
+.envoltura-etq__nombre .marca-wm__sabor { color: #3a0e24; }
+.envoltura-etq__nombre .marca-wm__puro { color: #b57618; }
+
+.envoltura-etq__texto { min-width: 0; flex: 1; }
 
 .envoltura-etq__denom {
   font-family: var(--f-titulo);
-  font-size: 5.9cqw;
-  margin: 1.6% 0 0;
+  font-weight: 600;
+  font-size: 4.6cqw;
+  margin: 0;
   color: #241b1e;
   line-height: 1.12;
 }
 
 .envoltura-etq__peso {
   font-family: var(--f-mono);
-  font-size: 6cqw;
+  font-size: 4.8cqw;
   font-weight: 600;
-  margin: 1.6% 0 0;
+  margin: 1.4cqw 0 0;
   color: #241b1e;
 }
 
 .envoltura-etq__lote {
   font-family: var(--f-mono);
-  font-size: 3.5cqw;
+  font-size: 3.3cqw;
   margin: 0;
   color: #6b5560;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
   border-top: 0.08em solid rgba(36, 27, 30, 0.18);
-  padding-top: 1.5%;
+  padding-top: 1.6cqw;
 }
 
-.envoltura-etq__sello { width: 22%; flex-shrink: 0; }
+.envoltura-etq__sello { width: 16cqw; flex-shrink: 0; }
 .envoltura-etq__sello svg { width: 100%; height: auto; display: block; }
 
 /* La luz sobre un cilindro: oscura en los bordes, brillante al centro. */
@@ -641,30 +629,4 @@
   font-size: 0.86rem;
   color: var(--texto-suave);
   max-width: 46ch;
-}
-
-/* ------------------------------------------------- hoja del logotipo */
-
-.nav__hoja, .etiqueta__hoja {
-  color: var(--c-ambar);
-  margin-right: 0.22em;
-  display: inline-block;
-}
-
-@media not (prefers-reduced-motion: reduce) {
-  .nav__marca:hover .nav__hoja {
-    animation: brotar 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-}
-
-@keyframes brotar {
-  0%   { rotate: 0deg; scale: 1; }
-  40%  { rotate: -18deg; scale: 1.25; }
-  100% { rotate: 0deg; scale: 1; }
-}
-
-.nav__marca {
-  display: inline-flex;
-  align-items: center;
-  font-size: 1.2rem;
 }

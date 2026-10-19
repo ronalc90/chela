@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { svgEan13 } from '@chela/brand/barcode';
 import { svgSello } from '@chela/brand/nutricional';
 import { construirEtiqueta } from '@chela/brand/etiqueta';
-import { Emblema } from './Logo';
+import { Logotipo } from './Logo';
 
 /**
  * La etiqueta hecha a mano, ahora digital y verificable.
@@ -146,14 +146,7 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
             </div>
 
             <h3 className="etiqueta__marca">
-              {campo('marca', (
-                <>
-                  <Emblema tamano={26} className="etiqueta__emblema" />
-                  <span className="marca-wm">
-                    <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
-                  </span>
-                </>
-              ))}
+              {campo('marca', <Logotipo tamano={78} className="etiqueta__logotipo" />)}
             </h3>
 
             <p className="etiqueta__denominacion">
@@ -213,7 +206,7 @@ export default function EtiquetaViva({ etiqueta: etiquetaProp }) {
           <p className="explica__norma">{info.norma}</p>
         </div>
 
-        <p style={{ marginTop: 18, fontSize: '0.92rem', color: 'var(--texto-suave)' }}>
+        <p style={{ marginTop: 18, fontSize: '0.92rem', color: 'var(--texto-suave)' }} className="explica__ayuda">
           Pasa el cursor por cualquier campo de la etiqueta —o tócalo en el celular— para ver qué
           exige la norma en ese punto. Los puntos rosados marcan los campos obligatorios.
         </p>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { construirEtiqueta } from '@chela/brand/etiqueta';
 import { svgSello } from '@chela/brand/nutricional';
+import { Emblema } from './Logo';
 
 /**
  * La etiqueta montada sobre la foto real del frasco.
@@ -56,10 +57,14 @@ export default function FrascoConEtiqueta({ foto = '/fotos/frasco-01.jpg' }) {
         >
           <div className="envoltura-etq__papel">
             <div className="envoltura-etq__fila">
-              <div className="envoltura-etq__texto">
-                <p className="envoltura-etq__marca">
+              {/* Canasta encima del nombre, como en toda la marca. */}
+              <p className="envoltura-etq__marca">
+                <Emblema detalle="simple" tamano={48} className="envoltura-etq__emblema" decorativo />
+                <span className="envoltura-etq__nombre">
                   <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
-                </p>
+                </span>
+              </p>
+              <div className="envoltura-etq__texto">
                 <p className="envoltura-etq__denom">{etiqueta.frente.denominacion}</p>
                 <p className="envoltura-etq__peso">{etiqueta.frente.contenidoNeto}</p>
               </div>
