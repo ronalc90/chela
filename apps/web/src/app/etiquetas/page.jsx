@@ -138,7 +138,7 @@ export default function GeneradorEtiquetas() {
 
       <main className="gen-main">
       <div className="envoltura no-imprimir">
-        <div className="gen-intro">
+        <div className="gen-intro carga-1">
           <span className="rotulo">Para imprimir y pegar</span>
           <h1>Generador de etiquetas</h1>
           <p className="plomo">
@@ -151,7 +151,7 @@ export default function GeneradorEtiquetas() {
 
       <div className="envoltura">
         <div className="gen">
-          <div className="gen__vista">
+          <div className="gen__vista carga-2">
             <div className="gen__barra no-imprimir">
               <div className="gen__pastillas">
                 <span className="pastilla">{imp.ancho} × {imp.alto} mm</span>
@@ -198,7 +198,7 @@ export default function GeneradorEtiquetas() {
             )}
           </div>
 
-          <div className="gen__panel no-imprimir">
+          <div className="gen__panel no-imprimir carga-3">
             <Biblioteca
               doc={doc}
               nombre={nombre}

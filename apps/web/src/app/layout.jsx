@@ -1,8 +1,10 @@
+import './movimiento.css';
 import './globals.css';
 import './animaciones.css';
 import './impresion.css';
 import './editor.css';
 import './responsive.css';
+import Movimiento from '@/components/Movimiento';
 import { marca, producto, tipografia } from '@chela/brand/tokens';
 
 export const metadata = {
@@ -49,7 +51,10 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href={tipografia.googleFontsHref} />
         <script dangerouslySetInnerHTML={{ __html: scriptTema }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Movimiento />
+      </body>
     </html>
   );
 }

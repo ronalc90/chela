@@ -242,7 +242,7 @@
    aplica la escala), así que aquí solo hace falta que nada se salga. */
 .hojas, .hojas__item, .hojas__escala { max-width: 100%; min-width: 0; }
 
-@media (max-width: 1039px) {
+@media (max-width: 939px) {
   /* En una sola columna la barra pegajosa ocupa menos alto. */
   .gen__barra { padding: 10px 12px; }
 }

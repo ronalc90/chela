@@ -1,0 +1,92 @@
+/* ==========================================================================
+   Sistema de movimiento — duraciones, curvas y distancias en un solo sitio.
+
+   Cualquier transición o animación del sitio sale de estas variables, para
+   que todo el movimiento se sienta de la misma mano. Si algo tiene que ir
+   más rápido o más lento en conjunto, se cambia aquí y punto.
+
+   El apagado por prefers-reduced-motion vive en globals.css y cubre todo el
+   documento; aquí además se dejan las distancias en cero, para que lo que
+   dependa de ellas tampoco salte.
+   ========================================================================== */
+
+:root {
+  /* Duraciones */
+  --dur-instante: 90ms;   /* realimentación de un clic */
+  --dur-rapida: 180ms;    /* hover, foco, cambios de color */
+  --dur-media: 280ms;     /* abrir, cerrar, aparecer */
+  --dur-lenta: 500ms;     /* entradas de bloques */
+  --dur-muy-lenta: 820ms; /* secuencia de carga de la portada */
+
+  /* Curvas */
+  --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);    /* frena suave: lo normal */
+  --ease-entrada: cubic-bezier(0.55, 0, 1, 0.45);   /* arranca suave: para irse */
+  --ease-ambas: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-resorte: cubic-bezier(0.34, 1.4, 0.64, 1); /* un pelín de rebote */
+
+  /* Distancias de entrada */
+  --desplaz-corto: 12px;
+  --desplaz: 28px;
+  --desplaz-largo: 44px;
+
+  /* Alias histórico: muchas reglas ya lo usan. */
+  --ease: var(--ease-salida);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --desplaz-corto: 0px;
+    --desplaz: 0px;
+    --desplaz-largo: 0px;
+  }
+}
+
+/* ----------------------------------------------- respaldo sin scroll-driven
+
+   Donde el navegador no entiende animation-timeline: view() (Firefox y
+   Safari viejos), un IntersectionObserver pone la clase `.visto`. El guardia
+   es `html.js-mov`, que añade ese mismo script: si el JS no corre, no hay
+   estado inicial escondido y la página se ve entera igual.
+   -------------------------------------------------------------------------- */
+
+@supports not (animation-timeline: view()) {
+  @media not (prefers-reduced-motion: reduce) {
+    .js-mov :is(.anim-subir, .anim-lado, .anim-posar, .anim-enfocar, .anim-revelar) {
+      opacity: 0;
+      transition:
+        opacity var(--dur-lenta) var(--ease-salida),
+        translate var(--dur-lenta) var(--ease-salida),
+        scale var(--dur-lenta) var(--ease-salida),
+        filter var(--dur-lenta) var(--ease-salida);
+    }
+
+    .js-mov .anim-subir { translate: 0 var(--desplaz-largo); }
+    .js-mov .anim-lado { translate: calc(-1 * var(--desplaz-largo)) 0; }
+    .js-mov .anim-posar { scale: 0.94; }
+    .js-mov .anim-enfocar { filter: blur(10px); }
+    .js-mov .anim-revelar { translate: 0 var(--desplaz); }
+
+    .js-mov :is(.anim-subir, .anim-lado, .anim-posar, .anim-enfocar, .anim-revelar).visto {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+      filter: none;
+    }
+  }
+}
+
+/* ------------------------------------------------------- movimiento barato
+
+   Las animaciones infinitas son las únicas que siguen gastando cuadros sin
+   que nadie interactúe. En pantallas chicas, donde además hay batería de por
+   medio y el adorno se aprecia menos, se apagan.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .flotar-suave,
+  .mora-flotante,
+  .vapor,
+  .frasco__relleno {
+    animation: none !important;
+  }
+}
