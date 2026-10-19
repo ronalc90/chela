@@ -29,14 +29,6 @@ export const FOTOS_FRASCO = {
     etiqueta: { x: 26, y: 54.5, w: 49, h: 20.5 },
     curva: true,
   },
-  casera: {
-    src: '/fotos/frasco-01.jpg',
-    alt: 'Frasco de mermelada de mora con tapa dorada',
-    ancho: 1659,
-    alto: 2212,
-    etiqueta: { x: 28, y: 43.5, w: 47.5, h: 17 },
-    curva: false,
-  },
 };
 
 export default function FrascoConEtiqueta({
