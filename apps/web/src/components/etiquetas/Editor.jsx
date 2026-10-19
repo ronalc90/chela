@@ -180,7 +180,7 @@ export default function Editor({ doc, r, cambiar, cambiarVarios }) {
           <Texto {...p} ruta="marca.parte1" etiqueta="Nombre — parte en negrita" max={60} />
           <Texto {...p} ruta="marca.parte2" etiqueta="Nombre — parte en cursiva" max={60} ayuda="Déjala vacía si la marca es una sola palabra." />
         </div>
-        <Interruptor {...p} ruta="marca.mostrarCanasta">Mostrar la canasta encima del nombre</Interruptor>
+        <Interruptor {...p} ruta="marca.mostrarCanasta">Mostrar la canasta debajo del nombre</Interruptor>
       </Seccion>
 
       <Seccion numero="2" titulo="Producto" resumen={r.denominacion}>

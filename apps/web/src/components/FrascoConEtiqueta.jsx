@@ -92,12 +92,12 @@ export default function FrascoConEtiqueta({
         >
           <div className="envoltura-etq__papel">
             <div className="envoltura-etq__fila">
-              {/* Canasta encima del nombre, como en toda la marca. */}
+              {/* Nombre arriba de la canasta, como en toda la marca. */}
               <p className="envoltura-etq__marca">
-                <Emblema detalle="simple" tamano={48} className="envoltura-etq__emblema" decorativo />
                 <span className="envoltura-etq__nombre">
                   <span className="marca-wm__sabor">Sabor</span><span className="marca-wm__puro">Puro</span>
                 </span>
+                <Emblema detalle="simple" tamano={48} className="envoltura-etq__emblema" decorativo />
               </p>
               <div className="envoltura-etq__texto">
                 <p className="envoltura-etq__denom">{etiqueta.frente.denominacion}</p>
