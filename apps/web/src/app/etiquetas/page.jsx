@@ -11,12 +11,11 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { plantillaPorDefecto, resolverPlantilla, validarPlantilla } from '@chela/brand/plantilla';
 import Editor, { escribir } from '@/components/etiquetas/Editor';
 import Hojas from '@/components/etiquetas/Hojas';
 import Biblioteca from '@/components/etiquetas/Biblioteca';
-import { Logotipo } from '@/components/Logo';
+import Nav from '@/components/Nav';
 
 const LLAVE_BORRADOR = 'puro-generador-borrador';
 const PX_POR_MM = 96 / 25.4;
@@ -134,27 +133,19 @@ export default function GeneradorEtiquetas() {
   ];
 
   return (
-    <main className="gen-main">
-      <div className="envoltura no-imprimir">
-        <div className="gen-cabeza">
-          <Link href="/" className="gen-volver">
-            <span aria-hidden="true">←</span> Volver al sitio
-          </Link>
-        </div>
+    <>
+      <Nav />
 
+      <main className="gen-main">
+      <div className="envoltura no-imprimir">
         <div className="gen-intro">
-          <Link href="/" aria-label="SaborPuro, inicio" className="gen-intro__logo">
-            <Logotipo tamano={104} />
-          </Link>
-          <div>
-            <span className="rotulo">Para imprimir y pegar</span>
-            <h1>Generador de etiquetas</h1>
-            <p className="plomo">
-              Cambia lo que quieras del rótulo —marca, nombre, cantidad, ingredientes, fabricante,
-              registro, código de barras, lote, fechas y sellos—, ajusta el tamaño de impresión y
-              guarda cada etiqueta con un nombre para volver a imprimirla cuando la necesites.
-            </p>
-          </div>
+          <span className="rotulo">Para imprimir y pegar</span>
+          <h1>Generador de etiquetas</h1>
+          <p className="plomo">
+            Cambia lo que quieras del rótulo —marca, nombre, cantidad, ingredientes, fabricante,
+            registro, código de barras, lote, fechas y sellos—, ajusta el tamaño de impresión y
+            guarda cada etiqueta con un nombre para volver a imprimirla cuando la necesites.
+          </p>
         </div>
       </div>
 
@@ -224,6 +215,7 @@ export default function GeneradorEtiquetas() {
           </div>
         </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

@@ -56,6 +56,7 @@ npm test             # suite del paquete de marca
 | Variable | Para qué |
 |---|---|
 | `NEXT_PUBLIC_API_URL` | URL pública de la API en Railway. Sin ella, la verificación de lote avisa que el servicio no está conectado. |
+| `ETIQUETAS_CLAVE` | Secreto de servidor, **sin** prefijo `NEXT_PUBLIC_`. Si está, el puente `/api/etiquetas` pone la clave por su cuenta y la biblioteca abre sin pedir nada; entonces cualquiera que abra el sitio puede ver, editar y borrar las etiquetas. Si no está, la biblioteca pide la clave y la guarda en ese navegador. |
 
 **apps/api**
 
@@ -63,6 +64,7 @@ npm test             # suite del paquete de marca
 |---|---|
 | `DATABASE_URL` | Postgres. Railway la inyecta al enlazar el servicio. |
 | `CORS_ORIGINS` | Orígenes permitidos, separados por coma. Los `*.vercel.app` se permiten siempre. |
+| `ETIQUETAS_CLAVE` | Clave de `/api/etiquetas`, comparada contra la cabecera `X-Clave`. Sin ella esas rutas responden 503 en vez de quedar abiertas. |
 | `PORT` | Lo asigna Railway. |
 
 ## Imprimir etiquetas

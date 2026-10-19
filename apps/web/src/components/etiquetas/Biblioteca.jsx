@@ -1,24 +1,24 @@
 'use client';
 
 /**
- * Biblioteca de etiquetas guardadas en el servidor.
+ * Biblioteca de etiquetas guardadas.
  *
- * Pide la clave una sola vez (queda en este navegador), lista lo guardado
- * y deja abrir, imprimir, guardar, duplicar y borrar. Toda la
- * conversación con /api/etiquetas pasa por aquí; la página solo recibe
- * avisos de qué cambió.
+ * Abre mostrando la lista: cada etiqueta se puede editar, imprimir o
+ * borrar desde su propia fila. Solo pide la clave si el servidor no la
+ * tiene puesta (ver lib/etiquetasApi.js); entonces queda guardada en este
+ * navegador y no se vuelve a preguntar.
  */
 
 import { useCallback, useEffect, useId, useState } from 'react';
 import { LIMITES } from '@chela/brand/plantilla';
 import {
-  API,
   ErrorApi,
   actualizarEtiqueta,
   borrarEtiqueta,
   crearEtiqueta,
   leerEtiqueta,
   listarEtiquetas,
+  necesitaClave,
 } from '@/lib/etiquetasApi';
 
 const LLAVE_CLAVE = 'puro-etiquetas-clave';
@@ -55,21 +55,14 @@ export default function Biblioteca({
   const idNombre = useId();
 
   const [clave, setClave] = useState('');
-  const [claveLeida, setClaveLeida] = useState(false);
+  const [arrancado, setArrancado] = useState(false);
+  const [pideClave, setPideClave] = useState(false);
   const [escrita, setEscrita] = useState('');
   const [lista, setLista] = useState(null);
   const [cargando, setCargando] = useState(false);
   const [ocupado, setOcupado] = useState('');
   const [error, setError] = useState('');
   const [confirmar, setConfirmar] = useState(null);
-
-  // La clave vive en este navegador: así no hay que teclearla cada vez.
-  useEffect(() => {
-    try {
-      setClave(localStorage.getItem(LLAVE_CLAVE) || '');
-    } catch {}
-    setClaveLeida(true);
-  }, []);
 
   const guardarClave = (valor) => {
     setClave(valor);
@@ -79,14 +72,20 @@ export default function Biblioteca({
     } catch {}
   };
 
-  /** Una clave rechazada se borra: si no, cada recarga volvería a fallar. */
+  /** Un 401 solo significa «hace falta la clave»: se pide y ya. */
   const avisar = useCallback((e) => {
     const mensaje = e instanceof ErrorApi ? e.message : 'Algo falló al hablar con el servidor.';
-    setError(mensaje);
     if (e instanceof ErrorApi && e.estado === 401) {
-      guardarClave('');
+      setPideClave(true);
       setLista(null);
+      try {
+        localStorage.removeItem(LLAVE_CLAVE);
+      } catch {}
+      setClave('');
+      setError(mensaje);
+      return;
     }
+    setError(mensaje);
   }, []);
 
   const cargar = useCallback(
@@ -95,6 +94,7 @@ export default function Biblioteca({
       setError('');
       try {
         setLista(await listarEtiquetas(conClave));
+        setPideClave(false);
       } catch (e) {
         avisar(e);
       } finally {
@@ -104,9 +104,17 @@ export default function Biblioteca({
     [avisar],
   );
 
+  // Primer intento: por el puente del servidor, con la clave guardada por si
+  // hace falta. Si no hace falta, la persona no se entera de que existe.
   useEffect(() => {
-    if (clave) cargar(clave);
-  }, [clave, cargar]);
+    let guardada = '';
+    try {
+      guardada = localStorage.getItem(LLAVE_CLAVE) || '';
+    } catch {}
+    setClave(guardada);
+    setArrancado(true);
+    cargar(guardada);
+  }, [cargar]);
 
   const entrar = (e) => {
     e.preventDefault();
@@ -114,6 +122,7 @@ export default function Biblioteca({
     if (!v) return;
     setEscrita('');
     guardarClave(v);
+    cargar(v);
   };
 
   const nombresUsados = (lista || []).map((x) => x.nombre);
@@ -170,18 +179,18 @@ export default function Biblioteca({
     }
   };
 
-  const eliminar = async () => {
+  const eliminar = async (id) => {
     setConfirmar(null);
-    setOcupado('eliminar');
+    setOcupado(`eliminar-${id}`);
     setError('');
     try {
-      await borrarEtiqueta(clave, idActual);
-      onBorrado(idActual);
+      await borrarEtiqueta(clave, id);
+      onBorrado(id);
       await cargar(clave);
     } catch (e) {
-      // Ya no estaba: el resultado es el mismo que buscaba la persona.
+      // Ya no estaba: el resultado es el que buscaba la persona.
       if (e instanceof ErrorApi && e.estado === 404) {
-        onBorrado(idActual);
+        onBorrado(id);
         await cargar(clave);
       } else avisar(e);
     } finally {
@@ -191,7 +200,7 @@ export default function Biblioteca({
 
   const traer = async (id, imprimir) => {
     setConfirmar(null);
-    setOcupado(`${imprimir ? 'imprimir' : 'abrir'}-${id}`);
+    setOcupado(`${imprimir ? 'imprimir' : 'editar'}-${id}`);
     setError('');
     try {
       const etq = await leerEtiqueta(clave, id);
@@ -230,21 +239,9 @@ export default function Biblioteca({
     </div>
   );
 
-  if (!claveLeida) return <section className="biblioteca" aria-busy="true" />;
+  if (!arrancado) return <section className="biblioteca" aria-busy="true" />;
 
-  if (!API) {
-    return (
-      <section className="biblioteca">
-        <h2 className="biblioteca__titulo">Etiquetas guardadas</h2>
-        <div className="aviso aviso--error">
-          El guardado no está conectado en esta copia del sitio (falta <code>NEXT_PUBLIC_API_URL</code>).
-          Puedes editar e imprimir igual; lo que escribas queda en este navegador.
-        </div>
-      </section>
-    );
-  }
-
-  if (!clave) {
+  if (pideClave) {
     return (
       <section className="biblioteca">
         <h2 className="biblioteca__titulo">Etiquetas guardadas</h2>
@@ -260,8 +257,8 @@ export default function Biblioteca({
               onChange={(e) => setEscrita(e.target.value)}
             />
             <small className="campo__ayuda">
-              Queda guardada en este navegador. Sin ella se puede editar e imprimir, pero no
-              guardar en el servidor.
+              Queda guardada en este navegador y no se vuelve a pedir. Sin ella puedes editar e
+              imprimir igual, pero no guardar.
             </small>
           </div>
           <button type="submit" className="boton boton--chico" disabled={!escrita.trim()}>Entrar</button>
@@ -275,9 +272,7 @@ export default function Biblioteca({
     <section className="biblioteca">
       <div className="biblioteca__cabeza">
         <h2 className="biblioteca__titulo">Etiquetas guardadas</h2>
-        <button type="button" className="boton-enlace" onClick={() => { guardarClave(''); setLista(null); }}>
-          Cambiar clave
-        </button>
+        <span className="pastilla">{(lista || []).length}</span>
       </div>
 
       <div className="campo">
@@ -315,23 +310,8 @@ export default function Biblioteca({
         >
           {ocupado === 'duplicar' ? 'Duplicando…' : 'Duplicar'}
         </button>
-        <button
-          type="button"
-          className="boton boton--fantasma boton--chico"
-          disabled={!idActual || Boolean(ocupado)}
-          onClick={() => setConfirmar({ tipo: 'eliminar' })}
-        >
-          {ocupado === 'eliminar' ? 'Eliminando…' : 'Eliminar'}
-        </button>
       </div>
 
-      {confirmar?.tipo === 'eliminar' && (
-        <Confirmacion
-          texto={`¿Borrar «${nombre.trim() || 'sin nombre'}» del servidor? No se puede deshacer.`}
-          boton="Sí, borrar"
-          alAceptar={eliminar}
-        />
-      )}
       {confirmar?.tipo === 'nueva' && (
         <Confirmacion
           texto="Hay cambios sin guardar. Si empiezas una nueva, se pierden."
@@ -351,9 +331,8 @@ export default function Biblioteca({
       ) : (
         <ul className="biblioteca__lista">
           {(lista || []).map((x) => {
-            const abriendo = ocupado === `abrir-${x.id}`;
-            const imprimiendo = ocupado === `imprimir-${x.id}`;
             const esperando = confirmar?.id === x.id ? confirmar : null;
+            const estado = (accion) => ocupado === `${accion}-${x.id}`;
             return (
               <li key={x.id} className={`guardada ${x.id === idActual ? 'guardada--actual' : ''}`}>
                 <div className="guardada__datos">
@@ -370,9 +349,9 @@ export default function Biblioteca({
                     type="button"
                     className="boton boton--fantasma boton--chico"
                     disabled={Boolean(ocupado)}
-                    onClick={() => pedir({ tipo: 'abrir', id: x.id }, () => traer(x.id, false))}
+                    onClick={() => pedir({ tipo: 'editar', id: x.id }, () => traer(x.id, false))}
                   >
-                    {abriendo ? 'Abriendo…' : 'Abrir'}
+                    {estado('editar') ? 'Abriendo…' : 'Editar'}
                   </button>
                   <button
                     type="button"
@@ -380,10 +359,25 @@ export default function Biblioteca({
                     disabled={Boolean(ocupado)}
                     onClick={() => pedir({ tipo: 'imprimir', id: x.id }, () => traer(x.id, true))}
                   >
-                    {imprimiendo ? 'Preparando…' : 'Imprimir'}
+                    {estado('imprimir') ? 'Preparando…' : 'Imprimir'}
+                  </button>
+                  <button
+                    type="button"
+                    className="boton boton--fantasma boton--chico boton--peligro"
+                    disabled={Boolean(ocupado)}
+                    onClick={() => setConfirmar({ tipo: 'eliminar', id: x.id, nombre: x.nombre })}
+                  >
+                    {estado('eliminar') ? 'Eliminando…' : 'Eliminar'}
                   </button>
                 </div>
-                {esperando && (
+                {esperando?.tipo === 'eliminar' && (
+                  <Confirmacion
+                    texto={`¿Borrar «${esperando.nombre}» del servidor? No se puede deshacer.`}
+                    boton="Sí, borrar"
+                    alAceptar={() => eliminar(x.id)}
+                  />
+                )}
+                {(esperando?.tipo === 'editar' || esperando?.tipo === 'imprimir') && (
                   <Confirmacion
                     texto="Hay cambios sin guardar en lo que tienes abierto."
                     boton={esperando.tipo === 'imprimir' ? 'Abrir e imprimir' : 'Abrir de todos modos'}
