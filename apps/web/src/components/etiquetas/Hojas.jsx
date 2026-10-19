@@ -8,6 +8,13 @@ import { Emblema } from '@/components/Logo';
 
 const MM_A_PX = 96 / 25.4;
 
+/** Une frases con punto sin doblarlo: «Bogotá D.C.» + «Tel. …» da una sola. */
+function unirFrases(...partes) {
+  return partes
+    .filter((x) => x && String(x).trim())
+    .reduce((acc, parte) => (acc ? `${acc.replace(/\.+$/, '')}. ${parte}` : String(parte)), '');
+}
+
 /** Una etiqueta física, armada con los datos ya resueltos de la plantilla. */
 export const EtiquetaImpresa = forwardRef(function EtiquetaImpresa({ r, barras, sellos }, ref) {
   const imp = r.plantilla.impresion;
@@ -54,11 +61,10 @@ export const EtiquetaImpresa = forwardRef(function EtiquetaImpresa({ r, barras, 
         {r.ingredientes && <p><strong>Ingredientes:</strong> {r.ingredientes}</p>}
         {r.conservacion && <p>{r.conservacion}</p>}
         {r.modoUso && <p><strong>Modo de uso:</strong> {r.modoUso}</p>}
-        {(fabricante || direccion) && (
+        {(fabricante || direccion || f.telefono) && (
           <p>
-            <strong>Fabricado por:</strong> {fabricante}
-            {direccion ? `. ${direccion}` : ''}
-            {f.telefono ? `. Tel. ${f.telefono}` : ''}
+            <strong>Fabricado por:</strong>{' '}
+            {unirFrases(fabricante, direccion, f.telefono ? `Tel. ${f.telefono}` : '')}
           </p>
         )}
         {(f.origen || f.sitio) && <p>{[f.origen, f.sitio].filter(Boolean).join(' · ')}</p>}

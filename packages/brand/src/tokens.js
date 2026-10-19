@@ -5,12 +5,14 @@
  * generador de etiquetas para imprimir y al libro de recetas sin tocar
  * nada mas.
  *
- * PENDIENTES POR RESOLVER antes de mandar a imprenta:
- *  - NIT de la organizacion.
- *  - Telefono: hay dos versiones en las fuentes originales,
- *    311 583 9051 y 321 383 8226.
- *  - Registro sanitario: hay dos versiones, NSA-8520-951 y RSA 11783305.
- *    Son formatos distintos y solo uno puede ser el vigente.
+ * DATOS DE EJEMPLO. Lo que hay aqui de fabricante, contacto y registro es
+ * de relleno a proposito: direccion de Calle Falsa, telefonos 300 000 0000,
+ * NIT y registro sanitario con ceros. Ningun dato personal real vive en el
+ * repositorio ni sale publicado por defecto.
+ *
+ * Los de verdad se escriben en el generador (/etiquetas, seccion Fabricante
+ * y seccion Registro) y se guardan con cada etiqueta en el servidor, que no
+ * es publico. Para que el sitio los muestre, cambialos aqui.
  */
 
 export const SITIO = 'https://saborpuro.lat';
@@ -20,22 +22,21 @@ export const marca = {
   nombreCorto: 'SaborPuro',
   descriptor: 'Mermelada artesanal de mora',
   eslogan: 'Del cultivo a la mesa, sin atajos',
-  razonSocial: 'Graciela Arrigui',
   // Quien elabora la mermelada; es lo que sale impreso en «Fabricado por».
-  elaboradaPor: 'Graciela Arrigui',
-  nit: 'PENDIENTE — NIT',
-  direccion: 'TV 7D 67-80 sur, Monteblanco',
+  razonSocial: 'Fabricante de ejemplo',
+  nit: '900.000.000-0',
+  direccion: 'Calle Falsa 123',
+  // La localidad y la ciudad se quedan: son de donde es la marca, no de
+  // quien la hace, y sin ellas el relato del sitio no se sostiene.
   localidad: 'Usme',
   ciudad: 'Bogotá D.C.',
   pais: 'Colombia',
-  registroSanitario: 'NSA-8520-951',
-  registroSanitarioAlterno: 'RSA 11783305',
+  registroSanitario: 'RSA-0000000000',
   sitio: SITIO,
   contacto: {
-    telefono: '311 583 9051',
-    telefonoAlterno: '321 383 8226',
-    whatsapp: '+57 311 583 9051',
-    email: 'hola@saborpuro.lat',
+    telefono: '300 000 0000',
+    whatsapp: '+57 300 000 0000',
+    email: 'contacto@ejemplo.com',
   },
 };
 

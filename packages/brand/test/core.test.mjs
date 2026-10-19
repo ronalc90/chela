@@ -129,9 +129,20 @@ test('validarEtiqueta detecta los campos que siguen pendientes', () => {
   });
   const problemas = validarEtiqueta(e);
 
+  // Los datos de marca son de ejemplo pero están completos, así que no
+  // falta ningún campo obligatorio; lo que queda son avisos.
   const errores = problemas.filter((p) => p.nivel === 'error');
-  assert.equal(errores.length, 1, 'con los datos reales solo el NIT sigue pendiente');
-  assert.equal(errores[0].campo, 'nit');
+  assert.deepEqual(errores, [], 'los datos de ejemplo no dejan campos vacíos');
   assert.ok(problemas.some((p) => p.campo === 'ean' && p.nivel === 'aviso'), 'avisa que el EAN es prefijo interno');
   assert.ok(problemas.some((p) => p.campo === 'declaraciones'), 'avisa que el sello bloquea declaraciones');
+
+  // Y si se vacía un obligatorio, lo sigue detectando.
+  const sinFabricante = validarEtiqueta({
+    ...e,
+    reverso: { ...e.reverso, fabricante: '' },
+  });
+  assert.ok(
+    sinFabricante.some((p) => p.nivel === 'error' && p.campo === 'fabricante'),
+    'sin fabricante sigue siendo un error',
+  );
 });
