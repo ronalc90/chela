@@ -47,8 +47,17 @@
 
 /* Dos columnas: el panel manda a la izquierda, la hoja a la derecha. En
    pantallas angostas la vista previa va primero, porque es la que dice si
-   el tamaño elegido sirve. */
-.gen { display: grid; gap: 24px; align-items: start; }
+   el tamaño elegido sirve.
+
+   Las columnas van siempre en minmax(0, 1fr), nunca en `auto`: la vista
+   previa lleva ancho fijo en píxeles y una columna `auto` crecería con
+   ella, ensanchando la página y dejando la escala mal calculada. */
+.gen {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
 
 .gen__panel { display: grid; gap: 18px; align-content: start; min-width: 0; }
 .gen__vista { display: grid; gap: 14px; min-width: 0; }
