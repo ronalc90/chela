@@ -1,15 +1,15 @@
 'use client';
 
 /**
- * Biblioteca de etiquetas guardadas.
+ * Catálogo de productos.
  *
- * Abre mostrando la lista: cada etiqueta se puede editar, imprimir o
- * borrar desde su propia fila. Solo pide la clave si el servidor no la
- * tiene puesta (ver lib/etiquetasApi.js); entonces queda guardada en este
- * navegador y no se vuelve a preguntar.
+ * Un producto es su rótulo más una foto: la plantilla guarda todo lo que se
+ * imprime, y la foto sirve para reconocerlo en la lista (no se imprime).
+ * Desde aquí se crea, se abre para editar, se imprime, se duplica y se
+ * borra, y solo se pide la clave si el servidor no la tiene puesta.
  */
 
-import { useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { LIMITES } from '@chela/brand/plantilla';
 import {
   ErrorApi,
@@ -18,14 +18,15 @@ import {
   crearEtiqueta,
   leerEtiqueta,
   listarEtiquetas,
-  necesitaClave,
 } from '@/lib/etiquetasApi';
+import { ErrorImagen, prepararFoto } from '@/lib/imagen';
 
 const LLAVE_CLAVE = 'puro-etiquetas-clave';
+const DESDE_CUANDO_BUSCAR = 6;
 
 /** «Mora 100 g» → «Mora 100 g (copia)», «… (copia 2)», sin repetir. */
 function nombreLibre(base, usados) {
-  const limpio = base.replace(/\s*\(copia( \d+)?\)$/i, '').trim() || 'Etiqueta';
+  const limpio = base.replace(/\s*\(copia( \d+)?\)$/i, '').trim() || 'Producto';
   const tomados = new Set(usados.map((n) => n.trim().toLowerCase()));
   let intento = `${limpio} (copia)`;
   for (let i = 2; tomados.has(intento.toLowerCase()); i += 1) intento = `${limpio} (copia ${i})`;
@@ -39,12 +40,34 @@ function fechaCorta(iso) {
   return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: '2-digit' });
 }
 
-export default function Biblioteca({
+/** Sin tildes y en minúsculas, para que el buscador no sea quisquilloso. */
+const plano = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+function Miniatura({ src, nombre, grande = false }) {
+  const clase = `producto-foto ${grande ? 'producto-foto--grande' : ''}`;
+  if (!src) {
+    return (
+      <span className={`${clase} producto-foto--vacia`} aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+          <rect x="3" y="5" width="18" height="14" rx="2.5" />
+          <circle cx="8.5" cy="10" r="1.6" />
+          <path d="M4 17l4.5-4.5 3 3 3-3L20 17" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    );
+  }
+  return <img className={clase} src={src} alt={`Foto de ${nombre || 'el producto'}`} loading="lazy" />;
+}
+
+export default function Productos({
   doc,
   nombre,
   cambiarNombre,
   idActual,
   sinGuardar,
+  foto,
+  miniatura,
+  cambiarFoto,
   onNueva,
   onAbrir,
   onGuardado,
@@ -53,6 +76,8 @@ export default function Biblioteca({
 }) {
   const idClave = useId();
   const idNombre = useId();
+  const idBuscar = useId();
+  const archivoRef = useRef(null);
 
   const [clave, setClave] = useState('');
   const [arrancado, setArrancado] = useState(false);
@@ -63,6 +88,7 @@ export default function Biblioteca({
   const [ocupado, setOcupado] = useState('');
   const [error, setError] = useState('');
   const [confirmar, setConfirmar] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
 
   const guardarClave = (valor) => {
     setClave(valor);
@@ -74,7 +100,9 @@ export default function Biblioteca({
 
   /** Un 401 solo significa «hace falta la clave»: se pide y ya. */
   const avisar = useCallback((e) => {
-    const mensaje = e instanceof ErrorApi ? e.message : 'Algo falló al hablar con el servidor.';
+    const mensaje = e instanceof ErrorApi || e instanceof ErrorImagen
+      ? e.message
+      : 'Algo falló al hablar con el servidor.';
     if (e instanceof ErrorApi && e.estado === 401) {
       setPideClave(true);
       setLista(null);
@@ -82,8 +110,6 @@ export default function Biblioteca({
         localStorage.removeItem(LLAVE_CLAVE);
       } catch {}
       setClave('');
-      setError(mensaje);
-      return;
     }
     setError(mensaje);
   }, []);
@@ -104,8 +130,6 @@ export default function Biblioteca({
     [avisar],
   );
 
-  // Primer intento: por el puente del servidor, con la clave guardada por si
-  // hace falta. Si no hace falta, la persona no se entera de que existe.
   useEffect(() => {
     let guardada = '';
     try {
@@ -127,27 +151,52 @@ export default function Biblioteca({
 
   const nombresUsados = (lista || []).map((x) => x.nombre);
 
+  /* ------------------------------------------------------------- la foto */
+
+  const elegirFoto = async (e) => {
+    const archivo = e.target.files?.[0];
+    e.target.value = '';
+    if (!archivo) return;
+    setOcupado('foto');
+    setError('');
+    try {
+      const { foto: grande, miniatura } = await prepararFoto(archivo);
+      cambiarFoto(grande, miniatura);
+    } catch (err) {
+      avisar(err);
+    } finally {
+      setOcupado('');
+    }
+  };
+
   /* ------------------------------------------------------------ acciones */
+
+  /** Lo que se manda al servidor: el rótulo, la foto y su miniatura. */
+  const cuerpo = (nombreUsar) => ({
+    nombre: nombreUsar,
+    datos: doc,
+    foto: foto || null,
+    miniatura: miniatura || null,
+  });
 
   const guardar = async () => {
     const limpio = nombre.trim();
     if (!limpio) {
-      setError('Ponle un nombre a la etiqueta antes de guardarla.');
+      setError('Ponle un nombre al producto antes de guardarlo.');
       return;
     }
     setOcupado('guardar');
     setError('');
     try {
       const etq = idActual
-        ? await actualizarEtiqueta(clave, idActual, { nombre: limpio, datos: doc })
-        : await crearEtiqueta(clave, { nombre: limpio, datos: doc });
+        ? await actualizarEtiqueta(clave, idActual, cuerpo(limpio))
+        : await crearEtiqueta(clave, cuerpo(limpio));
       onGuardado(etq);
       await cargar(clave);
     } catch (e) {
-      // Si la que creíamos guardada ya no existe, se vuelve a crear.
       if (e instanceof ErrorApi && e.estado === 404 && idActual) {
         try {
-          const etq = await crearEtiqueta(clave, { nombre: limpio, datos: doc });
+          const etq = await crearEtiqueta(clave, cuerpo(limpio));
           onGuardado(etq);
           await cargar(clave);
           return;
@@ -166,10 +215,7 @@ export default function Biblioteca({
     setOcupado('duplicar');
     setError('');
     try {
-      const etq = await crearEtiqueta(clave, {
-        nombre: nombreLibre(nombre || 'Etiqueta', nombresUsados),
-        datos: doc,
-      });
+      const etq = await crearEtiqueta(clave, cuerpo(nombreLibre(nombre || 'Producto', nombresUsados)));
       onGuardado(etq);
       await cargar(clave);
     } catch (e) {
@@ -188,7 +234,6 @@ export default function Biblioteca({
       onBorrado(id);
       await cargar(clave);
     } catch (e) {
-      // Ya no estaba: el resultado es el que buscaba la persona.
       if (e instanceof ErrorApi && e.estado === 404) {
         onBorrado(id);
         await cargar(clave);
@@ -220,12 +265,20 @@ export default function Biblioteca({
     else hacer();
   };
 
-  const nueva = () => {
+  const nuevo = () => {
     setConfirmar(null);
     onNueva();
   };
 
   /* -------------------------------------------------------------- vistas */
+
+  const visibles = useMemo(() => {
+    const todos = lista || [];
+    const q = plano(busqueda).trim();
+    if (!q) return todos;
+    return todos.filter((x) =>
+      plano(`${x.nombre} ${x.resumen?.denominacion || ''} ${x.resumen?.contenido || ''}`).includes(q));
+  }, [lista, busqueda]);
 
   const Confirmacion = ({ texto, boton, alAceptar }) => (
     <div className="confirmar">
@@ -244,7 +297,7 @@ export default function Biblioteca({
   if (pideClave) {
     return (
       <section className="biblioteca">
-        <h2 className="biblioteca__titulo">Etiquetas guardadas</h2>
+        <h2 className="biblioteca__titulo">Productos</h2>
         <form className="biblioteca__clave" onSubmit={entrar}>
           <div className="campo">
             <label htmlFor={idClave}>Clave de acceso</label>
@@ -271,23 +324,58 @@ export default function Biblioteca({
   return (
     <section className="biblioteca">
       <div className="biblioteca__cabeza">
-        <h2 className="biblioteca__titulo">Etiquetas guardadas</h2>
+        <h2 className="biblioteca__titulo">Productos</h2>
         <span className="pastilla">{(lista || []).length}</span>
       </div>
 
-      <div className="campo">
-        <label htmlFor={idNombre}>Nombre de esta etiqueta</label>
-        <input
-          id={idNombre}
-          value={nombre}
-          maxLength={LIMITES.nombre}
-          placeholder="Mora 100 g — frasco chico"
-          onChange={(e) => cambiarNombre(e.target.value)}
-        />
+      <div className="producto-edita">
+        <div className="producto-edita__foto">
+          <Miniatura src={foto} nombre={nombre} grande />
+          <div className="producto-edita__botones">
+            <button
+              type="button"
+              className="boton boton--fantasma boton--chico"
+              disabled={ocupado === 'foto'}
+              onClick={() => archivoRef.current?.click()}
+            >
+              {ocupado === 'foto' ? 'Procesando…' : foto ? 'Cambiar foto' : 'Subir foto'}
+            </button>
+            {foto && (
+              <button
+                type="button"
+                className="boton-enlace"
+                onClick={() => cambiarFoto(null, null)}
+              >
+                Quitar
+              </button>
+            )}
+          </div>
+          <input
+            ref={archivoRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="visualmente-oculto"
+            onChange={elegirFoto}
+          />
+        </div>
+
+        <div className="campo">
+          <label htmlFor={idNombre}>Nombre del producto</label>
+          <input
+            id={idNombre}
+            value={nombre}
+            maxLength={LIMITES.nombre}
+            placeholder="Mermelada de mora 100 g"
+            onChange={(e) => cambiarNombre(e.target.value)}
+          />
+          <small className="campo__ayuda">
+            La foto es para reconocerlo en esta lista; el rótulo que se imprime no la lleva.
+          </small>
+        </div>
       </div>
 
       <div className="biblioteca__estado">
-        <span className="pastilla">{idActual ? 'Guardada en el servidor' : 'Todavía sin guardar'}</span>
+        <span className="pastilla">{idActual ? 'Guardado en el servidor' : 'Todavía sin guardar'}</span>
         {sinGuardar && <span className="pastilla pastilla--alerta">Cambios sin guardar</span>}
       </div>
 
@@ -295,9 +383,9 @@ export default function Biblioteca({
         <button
           type="button"
           className="boton boton--fantasma boton--chico"
-          onClick={() => pedir({ tipo: 'nueva' }, nueva)}
+          onClick={() => pedir({ tipo: 'nuevo' }, nuevo)}
         >
-          Nueva
+          Nuevo producto
         </button>
         <button type="button" className="boton boton--chico" disabled={Boolean(ocupado)} onClick={guardar}>
           {ocupado === 'guardar' ? 'Guardando…' : idActual ? 'Guardar cambios' : 'Guardar'}
@@ -312,37 +400,56 @@ export default function Biblioteca({
         </button>
       </div>
 
-      {confirmar?.tipo === 'nueva' && (
+      {confirmar?.tipo === 'nuevo' && (
         <Confirmacion
-          texto="Hay cambios sin guardar. Si empiezas una nueva, se pierden."
-          boton="Empezar nueva"
-          alAceptar={nueva}
+          texto="Hay cambios sin guardar. Si empiezas uno nuevo, se pierden."
+          boton="Empezar nuevo"
+          alAceptar={nuevo}
         />
       )}
 
       {error && <div className="aviso aviso--error">{error}</div>}
 
+      {(lista || []).length >= DESDE_CUANDO_BUSCAR && (
+        <div className="campo">
+          <label htmlFor={idBuscar}>Buscar</label>
+          <input
+            id={idBuscar}
+            type="search"
+            value={busqueda}
+            placeholder="Nombre, alimento o cantidad"
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </div>
+      )}
+
       {cargando && !lista ? (
-        <p className="nota-campo">Cargando lo guardado…</p>
+        <p className="nota-campo">Cargando el catálogo…</p>
       ) : lista && lista.length === 0 ? (
         <p className="nota-campo">
-          Todavía no hay etiquetas guardadas. Ponle un nombre a esta y pulsa «Guardar».
+          Todavía no hay productos. Ponle un nombre a este, súbele una foto si quieres y pulsa
+          «Guardar».
         </p>
+      ) : visibles.length === 0 ? (
+        <p className="nota-campo">Ningún producto coincide con «{busqueda}».</p>
       ) : (
         <ul className="biblioteca__lista">
-          {(lista || []).map((x) => {
+          {visibles.map((x) => {
             const esperando = confirmar?.id === x.id ? confirmar : null;
             const estado = (accion) => ocupado === `${accion}-${x.id}`;
             return (
               <li key={x.id} className={`guardada ${x.id === idActual ? 'guardada--actual' : ''}`}>
                 <div className="guardada__datos">
-                  <strong className="guardada__nombre">{x.nombre}</strong>
-                  <span className="guardada__resumen">
-                    {[x.resumen?.denominacion, x.resumen?.contenido, x.resumen?.tamano]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                  <span className="guardada__fecha">Guardada el {fechaCorta(x.actualizadoEn)}</span>
+                  <Miniatura src={x.miniatura} nombre={x.nombre} />
+                  <div className="guardada__texto">
+                    <strong className="guardada__nombre">{x.nombre}</strong>
+                    <span className="guardada__resumen">
+                      {[x.resumen?.denominacion, x.resumen?.contenido, x.resumen?.tamano]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                    <span className="guardada__fecha">Guardado el {fechaCorta(x.actualizadoEn)}</span>
+                  </div>
                 </div>
                 <div className="guardada__botones">
                   <button

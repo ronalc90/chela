@@ -17,7 +17,8 @@
 
 const API = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 const CLAVE = process.env.ETIQUETAS_CLAVE || '';
-const MAX_CUERPO = 64 * 1024;
+// Da cabida a la foto del producto, igual que la API de destino.
+const MAX_CUERPO = 2 * 1024 * 1024;
 
 export const dynamic = 'force-dynamic';
 
@@ -43,7 +44,7 @@ async function reenviar(peticion, contexto) {
   let cuerpo;
   if (peticion.method === 'POST' || peticion.method === 'PUT') {
     cuerpo = await peticion.text();
-    if (cuerpo.length > MAX_CUERPO) return problema('La etiqueta es demasiado grande.', 413);
+    if (cuerpo.length > MAX_CUERPO) return problema('El producto es demasiado grande. Prueba con una foto más liviana.', 413);
   }
 
   let respuesta;

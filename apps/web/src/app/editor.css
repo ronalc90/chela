@@ -195,7 +195,52 @@
   box-shadow: inset 0 0 0 1px var(--acento);
 }
 
-.guardada__datos { display: grid; gap: 3px; min-width: 0; }
+/* ----------------------------------------------------- foto del producto */
+
+.producto-edita { display: grid; gap: 14px; }
+
+@container (min-width: 360px) {
+  .producto-edita {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.producto-edita__foto { display: grid; gap: 8px; justify-items: center; }
+.producto-edita__botones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.producto-foto {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--superficie-2);
+  border: 1px solid var(--borde);
+}
+
+.producto-foto--grande { width: 104px; height: 104px; border-radius: 16px; }
+
+/* Sin foto, un marco con el icono: la fila no cambia de alto por eso. */
+.producto-foto--vacia {
+  display: grid;
+  place-items: center;
+  color: var(--texto-suave);
+  border-style: dashed;
+  border-color: var(--borde-fuerte);
+}
+
+.producto-foto--vacia svg { width: 45%; height: 45%; }
+
+.guardada__datos {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.guardada__texto { display: grid; gap: 3px; min-width: 0; }
 
 .guardada__nombre { font-size: 0.97rem; line-height: 1.25; overflow-wrap: anywhere; }
 

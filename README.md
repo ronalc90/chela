@@ -65,6 +65,14 @@ npm test             # suite del paquete de marca
 | `DATABASE_URL` | Postgres. Railway la inyecta al enlazar el servicio. |
 | `CORS_ORIGINS` | Orígenes permitidos, separados por coma. Los `*.vercel.app` se permiten siempre. |
 | `ETIQUETAS_CLAVE` | Clave de `/api/etiquetas`, comparada contra la cabecera `X-Clave`. Sin ella esas rutas responden 503 en vez de quedar abiertas. |
+
+## Productos
+
+Cada producto guardado es su rótulo completo (ver `@chela/brand/plantilla`) más
+una foto opcional. La foto no se imprime: sirve para reconocerlo en el
+catálogo de `/etiquetas`. Se redimensiona y se recomprime a JPEG en el
+navegador antes de subirla (máximo 900 KB), y se guarda además una miniatura
+(máximo 80 KB) que es la única que viaja en el listado.
 | `PORT` | Lo asigna Railway. |
 
 ## Imprimir etiquetas

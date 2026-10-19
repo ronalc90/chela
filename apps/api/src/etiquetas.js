@@ -12,7 +12,11 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { normalizarPlantilla, resumenPlantilla, LIMITES } from '@chela/brand/plantilla';
 import { consultar } from './db.js';
 
-const MAX_CUERPO = 64 * 1024;
+// El cuerpo crece porque ahora puede traer la foto del producto.
+const MAX_CUERPO = 2 * 1024 * 1024;
+const MAX_FOTO = 900 * 1024;
+const MAX_MINIATURA = 80 * 1024;
+const TIPOS_FOTO = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
 const VENTANA_MS = 10 * 60 * 1000;
 const MAX_FALLOS = 12;
 
@@ -45,6 +49,11 @@ function anotarFallo(ip) {
   else r.n += 1;
 }
 
+/**
+ * El listado lleva solo la miniatura; la foto grande se manda únicamente al
+ * abrir un producto. Con veinte productos, mandarlas todas en la lista serían
+ * varios megas por cada vez que alguien entra.
+ */
 function filaAEtiqueta(fila, { conDatos = true } = {}) {
   const base = {
     id: Number(fila.id),
@@ -52,8 +61,22 @@ function filaAEtiqueta(fila, { conDatos = true } = {}) {
     creadoEn: fila.creado_en,
     actualizadoEn: fila.actualizado_en,
     resumen: resumenPlantilla(fila.datos),
+    miniatura: fila.miniatura || null,
   };
-  return conDatos ? { ...base, datos: normalizarPlantilla(fila.datos) } : base;
+  return conDatos
+    ? { ...base, datos: normalizarPlantilla(fila.datos), foto: fila.foto || null }
+    : base;
+}
+
+/**
+ * Acepta una foto como data URL de imagen, o nada. Devuelve `undefined` si
+ * el valor no sirve, para distinguirlo de null, que es «quítala».
+ */
+function leerFoto(valor, maximo) {
+  if (valor === null || valor === '') return null;
+  if (typeof valor !== 'string') return undefined;
+  if (!TIPOS_FOTO.test(valor) || valor.length > maximo) return undefined;
+  return valor;
 }
 
 function leerCuerpo(req, reply) {
@@ -71,8 +94,21 @@ function leerCuerpo(req, reply) {
     reply.code(400).send({ error: 'Faltan los datos de la etiqueta.' });
     return null;
   }
+  const foto = leerFoto(b.foto, MAX_FOTO);
+  if (foto === undefined) {
+    reply.code(400).send({
+      error: 'La foto no se pudo leer. Debe ser JPEG, PNG o WebP y pesar menos de 900 KB.',
+    });
+    return null;
+  }
+  const miniatura = leerFoto(b.miniatura, MAX_MINIATURA);
+  if (miniatura === undefined) {
+    reply.code(400).send({ error: 'La miniatura de la foto no es válida.' });
+    return null;
+  }
+
   // Se guarda siempre normalizada: lo que entra ya cumple los límites.
-  return { nombre, datos: normalizarPlantilla(b.datos) };
+  return { nombre, datos: normalizarPlantilla(b.datos), foto, miniatura };
 }
 
 function idValido(req, reply) {
@@ -110,7 +146,7 @@ export default async function rutasEtiquetas(app) {
 
   app.get('/', async () => {
     const filas = await consultar(
-      `SELECT id, nombre, datos, creado_en, actualizado_en
+      `SELECT id, nombre, datos, miniatura, creado_en, actualizado_en
          FROM etiquetas ORDER BY actualizado_en DESC LIMIT 500`,
     );
     return { etiquetas: filas.map((f) => filaAEtiqueta(f, { conDatos: false })) };
@@ -129,8 +165,9 @@ export default async function rutasEtiquetas(app) {
     if (!cuerpo) return reply;
     try {
       const filas = await consultar(
-        `INSERT INTO etiquetas (nombre, datos) VALUES ($1, $2) RETURNING *`,
-        [cuerpo.nombre, cuerpo.datos],
+        `INSERT INTO etiquetas (nombre, datos, foto, miniatura)
+         VALUES ($1, $2, $3, $4) RETURNING *`,
+        [cuerpo.nombre, cuerpo.datos, cuerpo.foto, cuerpo.miniatura],
       );
       return reply.code(201).send({ etiqueta: filaAEtiqueta(filas[0]) });
     } catch (e) {
@@ -146,9 +183,11 @@ export default async function rutasEtiquetas(app) {
     if (!cuerpo) return reply;
     try {
       const filas = await consultar(
-        `UPDATE etiquetas SET nombre = $2, datos = $3, actualizado_en = now()
+        `UPDATE etiquetas
+            SET nombre = $2, datos = $3, foto = $4, miniatura = $5,
+                actualizado_en = now()
           WHERE id = $1 RETURNING *`,
-        [id, cuerpo.nombre, cuerpo.datos],
+        [id, cuerpo.nombre, cuerpo.datos, cuerpo.foto, cuerpo.miniatura],
       );
       if (!filas.length) return reply.code(404).send({ error: 'Esa etiqueta no existe.' });
       return { etiqueta: filaAEtiqueta(filas[0]) };

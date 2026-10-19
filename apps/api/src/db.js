@@ -86,5 +86,12 @@ export async function migrar() {
   `);
   await consultar(`CREATE UNIQUE INDEX IF NOT EXISTS idx_etiquetas_nombre ON etiquetas (lower(nombre));`);
 
+  // Foto del producto. No se imprime en el rotulo: identifica el producto en
+  // el catalogo. Va en la fila como data URL de JPEG porque son pocas y
+  // pequenas, y asi no hace falta almacenamiento aparte. `miniatura` es la
+  // version chica, la unica que viaja en los listados.
+  await consultar(`ALTER TABLE etiquetas ADD COLUMN IF NOT EXISTS foto TEXT;`);
+  await consultar(`ALTER TABLE etiquetas ADD COLUMN IF NOT EXISTS miniatura TEXT;`);
+
   console.log('[db] migraciones aplicadas');
 }

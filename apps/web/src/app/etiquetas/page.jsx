@@ -7,14 +7,14 @@
  * en cada render se resuelve a lo que de verdad se imprime (lote, fechas,
  * EAN, sellos, capacidad de la hoja). El borrador queda en este navegador
  * para no perder nada al recargar; lo guardado con nombre vive en el
- * servidor y lo maneja la Biblioteca.
+ * servidor junto con su foto, y lo maneja el catálogo de Productos.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { plantillaPorDefecto, resolverPlantilla, validarPlantilla } from '@chela/brand/plantilla';
 import Editor, { escribir } from '@/components/etiquetas/Editor';
 import Hojas from '@/components/etiquetas/Hojas';
-import Biblioteca from '@/components/etiquetas/Biblioteca';
+import Productos from '@/components/etiquetas/Productos';
 import Nav from '@/components/Nav';
 
 const LLAVE_BORRADOR = 'puro-generador-borrador';
@@ -28,6 +28,9 @@ export default function GeneradorEtiquetas() {
   const [nombre, setNombre] = useState('');
   const [idActual, setIdActual] = useState(null);
   const [guardadoJson, setGuardadoJson] = useState(null);
+  const [foto, setFoto] = useState(null);
+  const [miniatura, setMiniatura] = useState(null);
+  const [fotoGuardada, setFotoGuardada] = useState(null);
   const [recortePx, setRecortePx] = useState(0);
   const [listo, setListo] = useState(false);
   const imprimirPendiente = useRef(false);
@@ -46,6 +49,9 @@ export default function GeneradorEtiquetas() {
           if (typeof b.nombre === 'string') setNombre(b.nombre);
           if (Number.isInteger(b.id)) setIdActual(b.id);
           if (typeof b.guardadoJson === 'string') setGuardadoJson(b.guardadoJson);
+          if (typeof b.foto === 'string') setFoto(b.foto);
+          if (typeof b.miniatura === 'string') setMiniatura(b.miniatura);
+          if (typeof b.fotoGuardada === 'string') setFotoGuardada(b.fotoGuardada);
         }
       }
     } catch {}
@@ -54,13 +60,20 @@ export default function GeneradorEtiquetas() {
 
   useEffect(() => {
     if (!listo) return;
+    const base = { doc, nombre, id: idActual, guardadoJson };
     try {
       localStorage.setItem(
         LLAVE_BORRADOR,
-        JSON.stringify({ doc, nombre, id: idActual, guardadoJson }),
+        JSON.stringify({ ...base, foto, miniatura, fotoGuardada }),
       );
-    } catch {}
-  }, [listo, doc, nombre, idActual, guardadoJson]);
+    } catch {
+      // Una foto grande puede no caber en el almacenamiento del navegador.
+      // Vale más conservar el rótulo sin la foto que perderlo todo.
+      try {
+        localStorage.setItem(LLAVE_BORRADOR, JSON.stringify({ ...base, miniatura }));
+      } catch {}
+    }
+  }, [listo, doc, nombre, idActual, guardadoJson, foto, miniatura, fotoGuardada]);
 
   /* -------------------------------------------------------------- cambios */
 
@@ -79,6 +92,16 @@ export default function GeneradorEtiquetas() {
     setNombre(etq.nombre);
     setIdActual(etq.id);
     setGuardadoJson(JSON.stringify(etq.datos));
+    // El listado no trae la foto grande; al abrir o guardar sí llega.
+    const grande = etq.foto ?? null;
+    setFoto(grande);
+    setMiniatura(etq.miniatura ?? null);
+    setFotoGuardada(grande);
+  }, []);
+
+  const cambiarFoto = useCallback((grande, chica) => {
+    setFoto(grande);
+    setMiniatura(chica);
   }, []);
 
   const alImprimirGuardada = useCallback(
@@ -94,11 +117,16 @@ export default function GeneradorEtiquetas() {
     setNombre('');
     setIdActual(null);
     setGuardadoJson(null);
+    setFoto(null);
+    setMiniatura(null);
+    setFotoGuardada(null);
   }, []);
 
   const alBorrado = useCallback((id) => {
-    setIdActual((actual) => (actual === id ? null : actual));
-    setGuardadoJson((j) => (idActual === id ? null : j));
+    if (idActual !== id) return;
+    setIdActual(null);
+    setGuardadoJson(null);
+    setFotoGuardada(null);
   }, [idActual]);
 
   // Imprimir desde la lista: primero se monta la etiqueta, después se
@@ -115,7 +143,9 @@ export default function GeneradorEtiquetas() {
   const r = useMemo(() => resolverPlantilla(doc), [doc]);
   const problemas = useMemo(() => validarPlantilla(r), [r]);
 
-  const sinGuardar = JSON.stringify(doc) !== (guardadoJson ?? LIMPIO);
+  // La foto no va dentro del rótulo, así que se compara aparte.
+  const sinGuardar =
+    JSON.stringify(doc) !== (guardadoJson ?? LIMPIO) || (foto ?? null) !== (fotoGuardada ?? null);
   const recorteMm = Math.round((recortePx / PX_POR_MM) * 10) / 10;
   const imp = r.plantilla.impresion;
   const cap = r.capacidad;
@@ -199,12 +229,15 @@ export default function GeneradorEtiquetas() {
           </div>
 
           <div className="gen__panel no-imprimir carga-3">
-            <Biblioteca
+            <Productos
               doc={doc}
               nombre={nombre}
               cambiarNombre={setNombre}
               idActual={idActual}
               sinGuardar={sinGuardar}
+              foto={foto}
+              miniatura={miniatura}
+              cambiarFoto={cambiarFoto}
               onNueva={alNueva}
               onAbrir={cargarEtiqueta}
               onGuardado={cargarEtiqueta}
