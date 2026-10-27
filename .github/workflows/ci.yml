@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Un solo run por rama o PR: un push nuevo a un PR cancela el run anterior.
+# En main no se cancela, para que cada commit fusionado quede verificado.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Pruebas y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      # El build de apps/web no necesita variables: NEXT_PUBLIC_API_URL y
+      # ETIQUETAS_CLAVE son opcionales y el código cae a '' si faltan.
+      # Si algún día el build las exige, usar aquí valores ficticios
+      # (p. ej. NEXT_PUBLIC_API_URL: https://api.example.invalid), nunca los
+      # de producción.
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # No hay scripts de lint ni de typecheck. `next build` hace su propia
+      # verificación de tipos y de lint cuando hay configuración para ello.
+      - name: Pruebas (packages/brand)
+        run: npm test
+
+      - name: Build de apps/web
+        run: npm run build:web
+
+      # apps/api es JavaScript sin paso de compilación (`build:api` apunta a
+      # un script que no existe); basta con comprobar la sintaxis.
+      - name: Sintaxis de apps/api
+        run: for f in apps/api/src/*.js; do node --check "$f"; done
