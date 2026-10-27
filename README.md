@@ -170,6 +170,10 @@ instalar dependencias ni base de datos.
 
 La web y la API no tienen pruebas automáticas.
 
+En GitHub Actions (`.github/workflows/ci.yml`), cada PR y cada push a `main`
+corren con Node 22 `npm ci`, `npm test`, `npm run build:web` y una
+comprobación de sintaxis de `apps/api`.
+
 ## Despliegue
 
 **Web → Vercel.** Proyecto `saborpuro` (framework Next.js, Node 22), con los
